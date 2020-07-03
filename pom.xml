@@ -10,6 +10,7 @@
     <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <javafaker.version>0.12</javafaker.version>
+    <jsontemplate.version>0.2.2</jsontemplate.version>
     <junit-jupiter-params.version>5.6.2</junit-jupiter-params.version>
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <maven.compiler.source>11</maven.compiler.source>
@@ -109,6 +110,16 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.json-template</groupId>
+      <artifactId>jsontemplate</artifactId>
+      <version>${jsontemplate.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-validator</artifactId>
     </dependency>
   </dependencies>
   <build>

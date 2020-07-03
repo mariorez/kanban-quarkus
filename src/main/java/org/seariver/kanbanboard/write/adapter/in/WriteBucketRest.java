@@ -1,10 +1,16 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -22,7 +28,7 @@ public class WriteBucketRest {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(BucketInput input) {
+    public Response create(@Valid BucketInput input) {
 
         var command = new CreateBucketCommand(input.uuid, input.position, input.name);
         handler.handle(command);
@@ -31,8 +37,13 @@ public class WriteBucketRest {
     }
 
     static class BucketInput {
+        @NotNull
+        @JsonProperty("id")
         public UUID uuid;
+        @Positive
         public double position;
+        @NotBlank
+        @Size(min = 1, max = 100)
         public String name;
     }
 }
