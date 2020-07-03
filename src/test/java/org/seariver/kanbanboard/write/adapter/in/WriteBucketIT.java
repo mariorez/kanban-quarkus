@@ -71,17 +71,16 @@ public class WriteBucketIT {
         var validUuid = UUID.randomUUID().toString();
         var validPosition = faker.number().randomDouble(5, 1, 10);
         var validName = "WHATEVER";
-        var invalidTextGreaterThan100Chars = "Lorem ipsum dolor sit amet consectetur adipiscing elit. Cras fringilla elit elementum ullamcorper turpis consequat";
 
         return Stream.of(
             arguments(null, validPosition, validName),
-            //arguments("", validPosition, validName),
+            arguments("@s()", validPosition, validName),
             arguments(validUuid, -1, validName),
             arguments(validUuid, 0, validName),
             arguments(validUuid, validPosition, null),
             arguments(validUuid, validPosition, ""),
-            arguments(validUuid, validPosition, "      ")
-            //arguments(validUuid, validPosition, invalidTextGreaterThan100Chars)
+            arguments(validUuid, validPosition, "      "),
+            arguments(validUuid, validPosition, "@s(length=101)")
         );
     }
 }

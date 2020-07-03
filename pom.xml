@@ -24,6 +24,8 @@
     <quarkus.platform.version>1.5.2.Final</quarkus.platform.version>
     <spring-jdbc.version>5.2.7.RELEASE</spring-jdbc.version>
     <surefire-plugin.version>2.22.1</surefire-plugin.version>
+    <approvaltests.version>9.1.0</approvaltests.version>
+    <gson.version>2.8.6</gson.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -78,6 +80,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
       <version>${commons-dbcp2.version}</version>
@@ -120,6 +127,18 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-validator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.approvaltests</groupId>
+      <artifactId>approvaltests</artifactId>
+      <version>${approvaltests.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

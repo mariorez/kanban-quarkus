@@ -5,10 +5,12 @@ import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.util.Optional;
 import java.util.UUID;
 
+@Singleton
 public class WriteCardRepositoryImpl implements WriteCardRepository {
 
     private NamedParameterJdbcTemplate jdbcTemplate;

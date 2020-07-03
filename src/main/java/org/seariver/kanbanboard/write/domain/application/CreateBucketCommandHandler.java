@@ -3,9 +3,9 @@ package org.seariver.kanbanboard.write.domain.application;
 import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 
-@ApplicationScoped
+@Singleton
 public class CreateBucketCommandHandler implements Handler<CreateBucketCommand> {
 
     private final WriteBucketRepository repository;

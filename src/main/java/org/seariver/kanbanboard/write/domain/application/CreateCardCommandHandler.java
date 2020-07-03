@@ -5,8 +5,10 @@ import org.seariver.kanbanboard.write.domain.core.Card;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
 
+import javax.inject.Singleton;
 import java.util.Optional;
 
+@Singleton
 public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
 
     private WriteBucketRepository bucketRepository;

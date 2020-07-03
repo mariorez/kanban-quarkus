@@ -7,7 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.INVALID_DUPLICATED_DATA;
 
-@ApplicationScoped
+@Singleton
 public class WriteBucketRepositoryImpl implements WriteBucketRepository {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
