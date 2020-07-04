@@ -1,7 +1,7 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
-import com.github.javafaker.Faker;
 import com.github.jsontemplate.JsonTemplate;
+import helper.IntegrationHelper;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,14 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-public class WriteBucketIT {
-
-    private static Faker faker = new Faker();
+public class CreateBucketIT extends IntegrationHelper {
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
@@ -48,7 +49,9 @@ public class WriteBucketIT {
     @MethodSource("provideInvalidData")
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String uuid,
                                                  double position,
-                                                 String name) {
+                                                 String name,
+                                                 String[] errorsFields,
+                                                 String[] errorsDetails) {
         // fixture
         var template = String.format("{" +
             "  id : %s," +
@@ -63,7 +66,13 @@ public class WriteBucketIT {
             .body(payload)
             .when().post("/v1/buckets")
             .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode());
+            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Invalid field"))
+            .and().body("errors", hasSize(1))
+            .and().body("errors.field", containsInAnyOrder(errorsFields))
+            .and().body("errors.detail", containsInAnyOrder(errorsDetails));
     }
 
     private static Stream<Arguments> provideInvalidData() {
@@ -73,14 +82,14 @@ public class WriteBucketIT {
         var validName = "WHATEVER";
 
         return Stream.of(
-            arguments(null, validPosition, validName),
-            arguments("@s()", validPosition, validName),
-            arguments(validUuid, -1, validName),
-            arguments(validUuid, 0, validName),
-            arguments(validUuid, validPosition, null),
-            arguments(validUuid, validPosition, ""),
-            arguments(validUuid, validPosition, "      "),
-            arguments(validUuid, validPosition, "@s(length=101)")
+            arguments(null, validPosition, validName, args("uuid"), args("must not be null")),
+            arguments("@s()", validPosition, validName, args("uuid"), args("must not be null")),
+            arguments(validUuid, -1, validName, args("position"), args("must be greater than 0")),
+            arguments(validUuid, 0, validName, args("position"), args("must be greater than 0")),
+            arguments(validUuid, validPosition, null, args("name"), args("must not be blank")),
+            arguments(validUuid, validPosition, "", args("name"), args("must not be blank")),
+            arguments(validUuid, validPosition, "      ", args("name"), args("must not be blank")),
+            arguments(validUuid, validPosition, "@s(length=101)", args("name"), args("size must be between 1 and 100"))
         );
     }
 }
