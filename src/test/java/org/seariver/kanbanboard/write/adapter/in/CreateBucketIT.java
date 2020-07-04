@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -28,12 +27,16 @@ public class CreateBucketIT extends IntegrationHelper {
 
         // fixture
         var uuid = UUID.randomUUID().toString();
-        var template = String.format("{" +
-            "  id : %s," +
+
+        var template = "{" +
+            "  id : $id," +
             "  position : @f," +
             "  name : @s" +
-            "}", uuid);
-        var payload = new JsonTemplate(template).prettyString();
+            "}";
+
+        var payload = new JsonTemplate(template)
+            .withVar("id", uuid)
+            .prettyString();
 
         // verify
         given()
@@ -53,12 +56,19 @@ public class CreateBucketIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
+        var templateId = uuid == null ? null : "$id";
+        var templateName = name == null || name.contains("@s") ? name : "$name";
+
         var template = String.format("{" +
             "  id : %s," +
             "  position : %s," +
             "  name : %s" +
-            "}", uuid, position, name);
-        var payload = new JsonTemplate(template).prettyString();
+            "}", templateId, position, templateName);
+
+        var payload = new JsonTemplate(template)
+            .withVar("id", uuid)
+            .withVar("name", name)
+            .prettyString();
 
         // verify
         given()
@@ -70,7 +80,6 @@ public class CreateBucketIT extends IntegrationHelper {
             .contentType(ContentType.JSON)
             .assertThat()
             .body("message", is("Invalid field"))
-            .and().body("errors", hasSize(1))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails));
     }
@@ -79,15 +88,15 @@ public class CreateBucketIT extends IntegrationHelper {
 
         var validUuid = UUID.randomUUID().toString();
         var validPosition = faker.number().randomDouble(5, 1, 10);
-        var validName = "WHATEVER";
+        var validName = "@s";
 
         return Stream.of(
             arguments(null, validPosition, validName, args("uuid"), args("must not be null")),
-            arguments("@s()", validPosition, validName, args("uuid"), args("must not be null")),
+            arguments("", validPosition, validName, args("uuid"), args("must not be null")),
             arguments(validUuid, -1, validName, args("position"), args("must be greater than 0")),
             arguments(validUuid, 0, validName, args("position"), args("must be greater than 0")),
             arguments(validUuid, validPosition, null, args("name"), args("must not be blank")),
-            arguments(validUuid, validPosition, "", args("name"), args("must not be blank")),
+            arguments(validUuid, validPosition, "", args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
             arguments(validUuid, validPosition, "      ", args("name"), args("must not be blank")),
             arguments(validUuid, validPosition, "@s(length=101)", args("name"), args("size must be between 1 and 100"))
         );

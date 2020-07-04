@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   postgres_kanban_quarkus:
-    image: postgres
+    image: postgres:12
     restart: always
     ports:
       - "5432:5432"
