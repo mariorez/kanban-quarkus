@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-public class CreateBucketIT extends IntegrationHelper {
+class CreateBucketIT extends IntegrationHelper {
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
@@ -29,13 +29,13 @@ public class CreateBucketIT extends IntegrationHelper {
         var uuid = UUID.randomUUID().toString();
 
         var template = "{" +
-            "  id : $id," +
+            "  uuid : $uuid," +
             "  position : @f," +
             "  name : @s" +
             "}";
 
         var payload = new JsonTemplate(template)
-            .withVar("id", uuid)
+            .withVar("uuid", uuid)
             .prettyString();
 
         // verify
@@ -56,17 +56,17 @@ public class CreateBucketIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
-        var templateId = uuid == null ? null : "$id";
+        var templateId = uuid == null ? null : "$uuid";
         var templateName = name == null || name.contains("@s") ? name : "$name";
 
         var template = String.format("{" +
-            "  id : %s," +
+            "  uuid : %s," +
             "  position : %s," +
             "  name : %s" +
             "}", templateId, position, templateName);
 
         var payload = new JsonTemplate(template)
-            .withVar("id", uuid)
+            .withVar("uuid", uuid)
             .withVar("name", name)
             .prettyString();
 
@@ -91,8 +91,9 @@ public class CreateBucketIT extends IntegrationHelper {
         var validName = "@s";
 
         return Stream.of(
-            arguments(null, validPosition, validName, args("uuid"), args("must not be null")),
-            arguments("", validPosition, validName, args("uuid"), args("must not be null")),
+            arguments(null, validPosition, validName, args("uuid"), args("must not be blank")),
+            arguments("", validPosition, validName, args("uuid", "uuid"), args("must not be blank", "invalid uuid format")),
+            arguments("foobar", validPosition, validName, args("uuid"), args("invalid uuid format")),
             arguments(validUuid, -1, validName, args("position"), args("must be greater than 0")),
             arguments(validUuid, 0, validName, args("position"), args("must be greater than 0")),
             arguments(validUuid, validPosition, null, args("name"), args("must not be blank")),
