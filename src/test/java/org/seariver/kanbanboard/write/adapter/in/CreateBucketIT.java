@@ -1,7 +1,9 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
 import com.github.jsontemplate.JsonTemplate;
+import helper.BlankStringValueProducer;
 import helper.IntegrationHelper;
+import helper.UuidStringValueProducer;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
@@ -50,24 +52,14 @@ class CreateBucketIT extends IntegrationHelper {
 
     @ParameterizedTest
     @MethodSource("provideInvalidData")
-    void GIVEN_InvalidData_MUST_ReturnBadRequest(String uuid,
-                                                 double position,
-                                                 String name,
+    void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
+
         // fixture
-        var templateId = uuid == null ? null : "$uuid";
-        var templateName = name == null || name.contains("@s") ? name : "$name";
-
-        var template = String.format("{" +
-            "  uuid : %s," +
-            "  position : %s," +
-            "  name : %s" +
-            "}", templateId, position, templateName);
-
-        var payload = new JsonTemplate(template)
-            .withVar("uuid", uuid)
-            .withVar("name", name)
+        var payload = new JsonTemplate(jsonTemplate)
+            .withValueProducer(new UuidStringValueProducer())
+            .withValueProducer(new BlankStringValueProducer())
             .prettyString();
 
         // verify
@@ -86,20 +78,34 @@ class CreateBucketIT extends IntegrationHelper {
 
     private static Stream<Arguments> provideInvalidData() {
 
-        var validUuid = UUID.randomUUID().toString();
-        var validPosition = faker.number().randomDouble(5, 1, 10);
-        var validName = "@s";
-
         return Stream.of(
-            arguments(null, validPosition, validName, args("uuid"), args("must not be blank")),
-            arguments("", validPosition, validName, args("uuid", "uuid"), args("must not be blank", "invalid uuid format")),
-            arguments("foobar", validPosition, validName, args("uuid"), args("invalid uuid format")),
-            arguments(validUuid, -1, validName, args("position"), args("must be greater than 0")),
-            arguments(validUuid, 0, validName, args("position"), args("must be greater than 0")),
-            arguments(validUuid, validPosition, null, args("name"), args("must not be blank")),
-            arguments(validUuid, validPosition, "", args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
-            arguments(validUuid, validPosition, "      ", args("name"), args("must not be blank")),
-            arguments(validUuid, validPosition, "@s(length=101)", args("name"), args("size must be between 1 and 100"))
+            arguments(
+                "{uuid:null, position:@f, name:@s}",
+                args("uuid"), args("must not be blank")),
+            arguments(
+                "{uuid:@s(length=0), position:@f, name:@s}",
+                args("uuid", "uuid"), args("must not be blank", "invalid uuid format")),
+            arguments(
+                "{uuid:@s(foobar), position:@f, name:@s}",
+                args("uuid"), args("invalid uuid format")),
+            arguments(
+                "{uuid:@uuid, position:@f(-1), name:@s}",
+                args("position"), args("must be greater than 0")),
+            arguments(
+                "{uuid:@uuid, position:@f(0), name:@s}",
+                args("position"), args("must be greater than 0")),
+            arguments(
+                "{uuid:@uuid, position:@f, name:null}",
+                args("name"), args("must not be blank")),
+            arguments(
+                "{uuid:@uuid, position:@f, name:@s(length=0)}",
+                args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
+            arguments(
+                "{uuid:@uuid, position:@f, name:@blank}",
+                args("name"), args("must not be blank")),
+            arguments(
+                "{uuid:@uuid, position:@f, name:@s(length=101)}",
+                args("name"), args("size must be between 1 and 100"))
         );
     }
 }
