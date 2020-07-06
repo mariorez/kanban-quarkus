@@ -43,7 +43,7 @@ class CreateBucketIT extends IntegrationHelper {
         // verify
         given()
             .contentType(ContentType.JSON)
-            .body(payload)
+            .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
             .statusCode(Status.CREATED.getStatusCode())
@@ -55,7 +55,6 @@ class CreateBucketIT extends IntegrationHelper {
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
-
         // fixture
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
@@ -65,7 +64,7 @@ class CreateBucketIT extends IntegrationHelper {
         // verify
         given()
             .contentType(ContentType.JSON)
-            .body(payload)
+            .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
             .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -73,7 +72,8 @@ class CreateBucketIT extends IntegrationHelper {
             .assertThat()
             .body("message", is("Invalid field"))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
-            .and().body("errors.detail", containsInAnyOrder(errorsDetails));
+            .and().body("errors.detail", containsInAnyOrder(errorsDetails))
+            .log().body();
     }
 
     private static Stream<Arguments> provideInvalidData() {
