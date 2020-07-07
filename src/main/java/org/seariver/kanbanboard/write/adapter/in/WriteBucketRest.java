@@ -5,6 +5,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
@@ -44,6 +45,7 @@ public class WriteBucketRest {
     @POST
     @APIResponse(responseCode = "201", description = "Bucket created successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
+    @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(@Valid CreateInput input) {
 
         var command = new CreateBucketCommand(UUID.fromString(input.uuid), input.position, input.name);
@@ -56,6 +58,7 @@ public class WriteBucketRest {
     @Path("{uuid}")
     @APIResponse(responseCode = "204", description = "Bucket updated successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
+    @APIResponse(responseCode = "500", description = "Internal server error")
     public Response update(
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)

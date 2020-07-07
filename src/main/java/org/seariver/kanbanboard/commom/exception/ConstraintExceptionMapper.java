@@ -1,6 +1,6 @@
-package org.seariver.kanbanboard.write.adapter.in;
+package org.seariver.kanbanboard.commom.exception;
 
-import org.seariver.kanbanboard.write.adapter.in.ResponseError.ErrorField;
+import org.seariver.kanbanboard.commom.exception.ResponseError.ErrorField;
 
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;

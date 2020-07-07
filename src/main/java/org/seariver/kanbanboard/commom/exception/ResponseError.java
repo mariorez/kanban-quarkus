@@ -1,4 +1,4 @@
-package org.seariver.kanbanboard.write.adapter.in;
+package org.seariver.kanbanboard.commom.exception;
 
 import java.util.List;
 
