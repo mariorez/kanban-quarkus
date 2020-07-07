@@ -34,6 +34,8 @@ import java.util.UUID;
 @Tag(name = "bucket")
 public class WriteBucketRest {
 
+    public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
+    public static final String INVALID_UUID = "invalid uuid format";
     @Inject
     private CreateBucketCommandHandler createHandler;
     @Inject
@@ -56,9 +58,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     public Response update(
         @Valid
-        @NotBlank
-        @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$",
-            message = "invalid uuid format")
+        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @PathParam String uuid,
         @Valid UpdateInput input) {
 
@@ -68,12 +68,7 @@ public class WriteBucketRest {
         return Response.noContent().build();
     }
 
-    static class CreateInput {
-        @NotBlank
-        @Pattern(
-            regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$",
-            message = "invalid uuid format")
-        public String uuid;
+    static class UpdateInput {
         @Positive
         public double position;
         @NotBlank
@@ -81,11 +76,9 @@ public class WriteBucketRest {
         public String name;
     }
 
-    static class UpdateInput {
-        @Positive
-        public double position;
+    static class CreateInput extends UpdateInput {
         @NotBlank
-        @Size(min = 1, max = 100)
-        public String name;
+        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+        public String uuid;
     }
 }

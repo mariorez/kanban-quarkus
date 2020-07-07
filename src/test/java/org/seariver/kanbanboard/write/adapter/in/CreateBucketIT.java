@@ -76,6 +76,24 @@ class CreateBucketIT extends IntegrationHelper {
             .log().body();
     }
 
+    @Test
+    void GIVEN_MalformedJson_MUST_ReturnBadRequest() {
+        // fixture
+        var payload = "{ malformed JSON >:{P ";
+
+        // verify
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload).log().body()
+            .when().post("/v1/buckets")
+            .then()
+            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Malformed JSON"))
+            .log().body();
+    }
+
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
