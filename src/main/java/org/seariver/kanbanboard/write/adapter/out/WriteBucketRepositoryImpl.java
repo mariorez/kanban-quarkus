@@ -18,6 +18,10 @@ import static org.seariver.kanbanboard.write.domain.exception.DomainException.Er
 @Singleton
 public class WriteBucketRepositoryImpl implements WriteBucketRepository {
 
+    public static final String POSITION_FIELD = "position";
+    public static final String UUID_FIELD = "uuid";
+    public static final String NAME_FIELD = "name";
+
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public WriteBucketRepositoryImpl(DataSource dataSource) {
@@ -31,9 +35,9 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
             var sql = "INSERT INTO bucket(uuid, position, name) values (:uuid, :position, :name)";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("uuid", bucket.getUuid())
-                .addValue("position", bucket.getPosition())
-                .addValue("name", bucket.getName());
+                .addValue(UUID_FIELD, bucket.getUuid())
+                .addValue(POSITION_FIELD, bucket.getPosition())
+                .addValue(NAME_FIELD, bucket.getName());
 
             jdbcTemplate.update(sql, parameters);
 
@@ -50,7 +54,7 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
                 }
 
                 if (existentBucket.getPosition() == bucket.getPosition()) {
-                    duplicatedDataException.addError("position", bucket.getPosition());
+                    duplicatedDataException.addError(POSITION_FIELD, bucket.getPosition());
                 }
             });
 
@@ -64,9 +68,9 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         var sql = "UPDATE bucket SET position = :position, name =:name WHERE uuid = :uuid";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue("uuid", bucket.getUuid())
-            .addValue("position", bucket.getPosition())
-            .addValue("name", bucket.getName());
+            .addValue(UUID_FIELD, bucket.getUuid())
+            .addValue(POSITION_FIELD, bucket.getPosition())
+            .addValue(NAME_FIELD, bucket.getName());
 
         jdbcTemplate.update(sql, parameters);
     }
@@ -76,16 +80,16 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         var sql = "SELECT id, uuid, position, name, created_at, updated_at FROM bucket WHERE uuid = :uuid";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue("uuid", uuid);
+            .addValue(UUID_FIELD, uuid);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
                 return Optional.of(new Bucket()
                     .setId(resultSet.getLong("id"))
-                    .setUuid(UUID.fromString(resultSet.getString("uuid")))
-                    .setPosition(resultSet.getDouble("position"))
-                    .setName(resultSet.getString("name"))
+                    .setUuid(UUID.fromString(resultSet.getString(UUID_FIELD)))
+                    .setPosition(resultSet.getDouble(POSITION_FIELD))
+                    .setName(resultSet.getString(NAME_FIELD))
                     .setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime())
                     .setUpdatedAt(resultSet.getTimestamp("updated_at").toLocalDateTime())
                 );
@@ -100,15 +104,15 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         var sql = "SELECT id, uuid, position, name, created_at, updated_at FROM bucket WHERE uuid = :uuid OR position = :position";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue("uuid", uuid)
-            .addValue("position", position);
+            .addValue(UUID_FIELD, uuid)
+            .addValue(POSITION_FIELD, position);
 
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
             new Bucket()
                 .setId(rs.getLong("id"))
-                .setUuid(UUID.fromString(rs.getString("uuid")))
-                .setPosition(rs.getDouble("position"))
-                .setName(rs.getString("name"))
+                .setUuid(UUID.fromString(rs.getString(UUID_FIELD)))
+                .setPosition(rs.getDouble(POSITION_FIELD))
+                .setName(rs.getString(NAME_FIELD))
                 .setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime())
                 .setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
         );

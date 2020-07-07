@@ -13,6 +13,13 @@ import java.util.UUID;
 @Singleton
 public class WriteCardRepositoryImpl implements WriteCardRepository {
 
+    public static final String BUCKET_ID_FIELD = "bucket_id";
+    public static final String UUID_FIELD = "uuid";
+    public static final String POSITION_FIELD = "position";
+    public static final String NAME_FIELD = "name";
+    public static final String CREATED_AT_FIELD = "created_at";
+    public static final String UPDATED_AT_FIELD = "updated_at";
+
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public WriteCardRepositoryImpl(DataSource dataSource) {
@@ -24,10 +31,10 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
         var sql = "INSERT INTO card (bucket_id, uuid, position, name) values (:bucket_id, :uuid, :position, :name)";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue("bucket_id", card.getBucketId())
-            .addValue("uuid", card.getUuid())
-            .addValue("position", card.getPosition())
-            .addValue("name", card.getName());
+            .addValue(BUCKET_ID_FIELD, card.getBucketId())
+            .addValue(UUID_FIELD, card.getUuid())
+            .addValue(POSITION_FIELD, card.getPosition())
+            .addValue(NAME_FIELD, card.getName());
 
         jdbcTemplate.update(sql, parameters);
     }
@@ -38,18 +45,18 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
         var sql = "SELECT bucket_id, uuid, position, name, created_at, updated_at FROM card WHERE uuid = :uuid";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue("uuid", uuid);
+            .addValue(UUID_FIELD, uuid);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
                 return Optional.of(new Card()
-                    .setBucketId(resultSet.getLong("bucket_id"))
-                    .setUuid(UUID.fromString(resultSet.getString("uuid")))
-                    .setPosition(resultSet.getDouble("position"))
-                    .setName(resultSet.getString("name"))
-                    .setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime())
-                    .setUpdatedAt(resultSet.getTimestamp("updated_at").toLocalDateTime())
+                    .setBucketId(resultSet.getLong(BUCKET_ID_FIELD))
+                    .setUuid(UUID.fromString(resultSet.getString(UUID_FIELD)))
+                    .setPosition(resultSet.getDouble(POSITION_FIELD))
+                    .setName(resultSet.getString(NAME_FIELD))
+                    .setCreatedAt(resultSet.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
+                    .setUpdatedAt(resultSet.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
                 );
             }
 

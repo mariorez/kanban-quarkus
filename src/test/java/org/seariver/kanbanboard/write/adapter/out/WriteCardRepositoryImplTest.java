@@ -1,8 +1,10 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
-import helper.DataSourceHelper;
+import helper.TestHelper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.seariver.kanbanboard.write.adapter.DataSourceMock;
 import org.seariver.kanbanboard.write.domain.core.Card;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
 
@@ -11,13 +13,14 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class WriteCardRepositoryImplTest extends DataSourceHelper {
+@Tag("unit")
+class WriteCardRepositoryImplTest extends TestHelper {
 
     private WriteCardRepositoryImpl repository;
 
     @BeforeEach
     void setup() {
-        repository = new WriteCardRepositoryImpl(dataSource);
+        repository = new WriteCardRepositoryImpl(new DataSourceMock());
     }
 
     @Test

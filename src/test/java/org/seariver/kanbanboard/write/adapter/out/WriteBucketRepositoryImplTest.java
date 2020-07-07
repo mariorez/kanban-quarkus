@@ -1,11 +1,13 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
-import helper.DataSourceHelper;
+import helper.TestHelper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.seariver.kanbanboard.write.adapter.DataSourceMock;
 import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
@@ -19,13 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class WriteBucketRepositoryImplTest extends DataSourceHelper {
+@Tag("unit")
+class WriteBucketRepositoryImplTest extends TestHelper {
 
     private WriteBucketRepositoryImpl repository;
 
     @BeforeEach
     void setup() {
-        repository = new WriteBucketRepositoryImpl(dataSource);
+        repository = new WriteBucketRepositoryImpl(new DataSourceMock());
     }
 
     @Test
@@ -50,7 +53,7 @@ class WriteBucketRepositoryImplTest extends DataSourceHelper {
         // then
         var actualOptional = repository.findByUuid(id);
         var actual = actualOptional.get();
-        assertThat(actual.getId()).isGreaterThan(0);
+        assertThat(actual.getId()).isPositive();
         assertThat(actual.getUuid()).isEqualTo(expected.getUuid());
         assertThat(actual.getPosition()).isEqualTo(expected.getPosition());
         assertThat(actual.getName()).isEqualTo(expected.getName());

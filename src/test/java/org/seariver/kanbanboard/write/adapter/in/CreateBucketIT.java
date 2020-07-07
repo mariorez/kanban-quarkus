@@ -94,6 +94,39 @@ class CreateBucketIT extends IntegrationHelper {
             .log().body();
     }
 
+    @Test
+    void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
+
+        var duplicatedUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var duplicatedPosition = 100.15;
+
+        // given
+        var template = "{" +
+            "  uuid : $uuid," +
+            "  position : $position," +
+            "  name : @s" +
+            "}";
+
+        var payload = new JsonTemplate(template)
+            .withVar("uuid", duplicatedUuid)
+            .withVar("position", duplicatedPosition)
+            .prettyString();
+
+        // verify
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload).log().body()
+            .when().post("/v1/buckets")
+            .then()
+            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Invalid field"))
+            .and().body("errors.field", containsInAnyOrder("code"))
+            .and().body("errors.detail", containsInAnyOrder("1000"))
+            .log().body();
+    }
+
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
