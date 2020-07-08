@@ -9,7 +9,7 @@ import javax.inject.Inject;
 public abstract class IntegrationHelper extends TestHelper {
 
     @Inject
-    DataSourceMock dataSource;
+    protected DataSourceMock dataSource;
 
     protected static String[] args(String... items) {
         return items;

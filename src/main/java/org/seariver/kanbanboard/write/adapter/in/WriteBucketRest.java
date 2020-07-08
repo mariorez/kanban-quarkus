@@ -5,9 +5,11 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
 
 import javax.inject.Inject;
@@ -19,6 +21,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -52,6 +55,23 @@ public class WriteBucketRest {
         return Response.created(URI.create(String.format("v1/buckets/%s", input.uuid))).build();
     }
 
+    @PUT
+    @Path("{uuid}")
+    @APIResponse(responseCode = "201", description = "Bucket update successful")
+    @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
+    @APIResponse(responseCode = "500", description = "Internal server error")
+    public Response update(
+        @Valid
+        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+        @PathParam("uuid") String uuid,
+        @Valid UpdateInput input) {
+
+        var command = new UpdateBucketCommand(UUID.fromString(uuid), input.name);
+        updateHandler.handle(command);
+
+        return Response.noContent().build();
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class CreateInput {
         @NotBlank
@@ -59,6 +79,13 @@ public class WriteBucketRest {
         public String uuid;
         @Positive
         public double position;
+        @NotBlank
+        @Size(min = 1, max = 100)
+        public String name;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class UpdateInput {
         @NotBlank
         @Size(min = 1, max = 100)
         public String name;

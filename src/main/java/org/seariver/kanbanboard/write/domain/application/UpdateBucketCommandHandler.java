@@ -27,10 +27,7 @@ public class UpdateBucketCommandHandler implements Handler<UpdateBucketCommand> 
         }
 
         var bucket = bucketOptional.get();
-
-        bucket
-            .setPosition(command.getPosition())
-            .setName(command.getName());
+        bucket.setName(command.getName());
 
         repository.update(bucket);
     }
