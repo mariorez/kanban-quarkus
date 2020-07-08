@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-class CreateBucketIT extends IntegrationHelper {
+class BuckeCreationtIT extends IntegrationHelper {
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
@@ -139,6 +139,9 @@ class CreateBucketIT extends IntegrationHelper {
             arguments(
                 "{uuid:@s(foobar), position:@f, name:@s}",
                 args("uuid"), args("invalid uuid format")),
+            arguments(
+                "{notExistent:@s, position:@f, name:@s}",
+                args("uuid"), args("must not be blank")),
             arguments(
                 "{uuid:@uuid, position:@f(-1), name:@s}",
                 args("position"), args("must be greater than 0")),
