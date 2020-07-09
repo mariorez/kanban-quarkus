@@ -15,7 +15,6 @@ import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -31,7 +30,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-@Transactional
 @Path("v1/buckets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

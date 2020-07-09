@@ -57,8 +57,7 @@ class BucketUpdateIT extends IntegrationHelper {
 
     @ParameterizedTest
     @MethodSource("provideInvalidData")
-    void GIVEN_InvalidData_MUST_ReturnBadRequest(String uuid,
-                                                 String jsonTemplate,
+    void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
@@ -71,7 +70,7 @@ class BucketUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{uuid}", uuid)
+            .when().put("/v1/buckets/{uuid}", UUID.randomUUID().toString())
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -114,15 +113,13 @@ class BucketUpdateIT extends IntegrationHelper {
         var validUuid = UUID.randomUUID().toString();
 
         return Stream.of(
-            arguments("whatever", "{name:@s}",
-                args("uuid"), args("invalid uuid format")),
-            arguments(validUuid, "{name:null}",
+            arguments("{name:null}",
                 args("name"), args("must not be blank")),
-            arguments(validUuid, "{name:@s(length=0)}",
+            arguments("{name:@s(length=0)}",
                 args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
-            arguments(validUuid, "{name:@blank}",
+            arguments("{name:@blank}",
                 args("name"), args("must not be blank")),
-            arguments(validUuid, "{notExistent:@s}",
+            arguments("{notExistent:@s}",
                 args("name"), args("must not be blank"))
         );
     }
