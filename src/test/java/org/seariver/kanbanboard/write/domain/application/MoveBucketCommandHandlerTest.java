@@ -17,42 +17,44 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
-class UpdateBucketCommandHandlerTest extends TestHelper {
+public class MoveBucketCommandHandlerTest extends TestHelper {
 
     @Test
-    void GIVEN_ValidCommand_MUST_UpdateBucketInDatabase() {
+    void GIVEN_ValidPosition_MUST_UpdateBucketPosition() {
 
         // given
-        var uuid = UUID.fromString("6d9db741-ef57-4d5a-ac0f-34f68fb0ab5e");
-        var name = faker.pokemon().name();
-        var command = new UpdateBucketCommand(uuid, name);
+        var uuid = UUID.randomUUID();
+        var position = faker.number().randomDouble(3, 1, 10);
+        var command = new MoveBucketCommand(uuid, position);
         var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setUuid(uuid).setPosition(123).setName("FOOBAR");
+        var bucket = new Bucket().setUuid(uuid).setPosition(123);
         when(repository.findByUuid(uuid)).thenReturn(Optional.of(bucket));
 
         // when
-        var handler = new UpdateBucketCommandHandler(repository);
+        var handler = new MoveBucketCommandHandler(repository);
         handler.handle(command);
 
         // then
         verify(repository).findByUuid(uuid);
         verify(repository).update(bucket);
         assertThat(bucket.getUuid()).isEqualTo(uuid);
-        assertThat(bucket.getName()).isEqualTo(name);
+        assertThat(bucket.getPosition()).isEqualTo(position);
     }
 
     @Test
-    void GIVEN_NotExistentBucket_MUST_ThrowException() {
+    void GIVEN_NotExistentUuid_MUST_ThrowException() {
 
         // given
-        var uuid = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
-        var command = new UpdateBucketCommand(uuid, "WHATEVER");
+        var uuid = UUID.randomUUID();
+        var position = faker.number().randomDouble(3, 1, 10);
+        var command = new MoveBucketCommand(uuid, position);
         var repository = mock(WriteBucketRepository.class);
         when(repository.findByUuid(uuid)).thenReturn(Optional.empty());
 
         // when
-        var handler = new UpdateBucketCommandHandler(repository);
-        var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
+        var handler = new MoveBucketCommandHandler(repository);
+        var exception = assertThrows(
+            BucketNotExistentException.class, () -> handler.handle(command));
 
         // then
         verify(repository).findByUuid(uuid);

@@ -38,12 +38,12 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("validDataProvider")
-    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID id,
+    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID uuid,
                                                                     double position,
                                                                     String name) {
         // given
         var expected = new Bucket()
-            .setUuid(id)
+            .setUuid(uuid)
             .setPosition(position)
             .setName(name);
 
@@ -51,7 +51,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.create(expected);
 
         // then
-        var actualOptional = repository.findByUuid(id);
+        var actualOptional = repository.findByUuid(uuid);
         var actual = actualOptional.get();
         assertThat(actual.getId()).isPositive();
         assertThat(actual.getUuid()).isEqualTo(expected.getUuid());
@@ -63,12 +63,12 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("invalidDataProvider")
-    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID id,
+    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID uuid,
                                                                           double position,
                                                                           Map<String, Object> expectedError) {
         // given
         var expected = new Bucket()
-            .setUuid(id)
+            .setUuid(uuid)
             .setPosition(position)
             .setName("WHATEVER");
 
@@ -84,8 +84,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     @Test
     void WHEN_UpdatingBucket_WITH_ValidData_MUST_SaveOnDatabase() {
         // given
-        var id = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
-        var actualBucket = repository.findByUuid(id).get();
+        var uuid = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
+        var actualBucket = repository.findByUuid(uuid).get();
         assertThat(actualBucket.getPosition()).isEqualTo(200.987);
         assertThat(actualBucket.getName()).isEqualTo("SECOND-BUCKET");
 
@@ -97,8 +97,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.update(actualBucket);
 
         // then
-        var expectedBucket = repository.findByUuid(id).get();
-        assertThat(expectedBucket.getUuid()).isEqualTo(id);
+        var expectedBucket = repository.findByUuid(uuid).get();
+        assertThat(expectedBucket.getUuid()).isEqualTo(uuid);
         assertThat(expectedBucket.getPosition()).isEqualTo(position);
         assertThat(expectedBucket.getName()).isEqualTo(name);
         assertThat(expectedBucket.getCreatedAt()).isNotNull();

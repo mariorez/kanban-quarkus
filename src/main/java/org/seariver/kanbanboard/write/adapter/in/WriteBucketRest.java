@@ -9,6 +9,8 @@ import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
+import org.seariver.kanbanboard.write.domain.application.MoveBucketCommandHandler;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
 
@@ -42,6 +44,8 @@ public class WriteBucketRest {
     private CreateBucketCommandHandler createHandler;
     @Inject
     private UpdateBucketCommandHandler updateHandler;
+    @Inject
+    private MoveBucketCommandHandler moveHandler;
 
     @POST
     @APIResponse(responseCode = "201", description = "Bucket created successful")
@@ -72,6 +76,23 @@ public class WriteBucketRest {
         return Response.noContent().build();
     }
 
+    @PUT
+    @Path("{uuid}/move")
+    @APIResponse(responseCode = "201", description = "Bucket moved successful")
+    @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
+    @APIResponse(responseCode = "500", description = "Internal server error")
+    public Response move(
+        @Valid
+        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+        @PathParam("uuid") String uuid,
+        @Valid MoveInput input) {
+
+        var command = new MoveBucketCommand(UUID.fromString(uuid), input.position);
+        moveHandler.handle(command);
+
+        return Response.noContent().build();
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class CreateInput {
         @NotBlank
@@ -89,5 +110,11 @@ public class WriteBucketRest {
         @NotBlank
         @Size(min = 1, max = 100)
         public String name;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class MoveInput {
+        @Positive
+        public double position;
     }
 }

@@ -115,7 +115,7 @@ class BucketUpdateIT extends IntegrationHelper {
 
         return Stream.of(
             arguments("whatever", "{name:@s}",
-                args("arg0"), args("invalid uuid format")),
+                args("uuid"), args("invalid uuid format")),
             arguments(validUuid, "{name:null}",
                 args("name"), args("must not be blank")),
             arguments(validUuid, "{name:@s(length=0)}",
