@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
@@ -47,7 +48,7 @@ class BucketUpdateIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().put("/v1/buckets/{uuid}", uuid)
             .then()
-            .statusCode(Status.NO_CONTENT.getStatusCode());
+            .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var actualBucket = repository.findByUuid(UUID.fromString(uuid)).get();
@@ -78,6 +79,33 @@ class BucketUpdateIT extends IntegrationHelper {
             .body("message", is("Invalid field"))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails))
+            .log().body();
+    }
+
+    @Test
+    void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
+
+        // fixture
+        var notExistentUuid = UUID.randomUUID().toString();
+
+        var template = "{" +
+            "  name : @s" +
+            "}";
+
+        var payload = new JsonTemplate(template).prettyString();
+
+        // verify
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload).log().body()
+            .when().put("/v1/buckets/{notExistentUuid}", notExistentUuid)
+            .then()
+            .statusCode(BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Invalid field"))
+            .and().body("errors.field", containsInAnyOrder("code"))
+            .and().body("errors.detail", containsInAnyOrder("1001"))
             .log().body();
     }
 
