@@ -110,8 +110,6 @@ class BucketUpdateIT extends IntegrationHelper {
 
     private static Stream<Arguments> provideInvalidData() {
 
-        var validUuid = UUID.randomUUID().toString();
-
         return Stream.of(
             arguments("{name:null}",
                 args("name"), args("must not be blank")),
