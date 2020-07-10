@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.seariver.kanbanboard.write.adapter.out.WriteBucketRepositoryImpl;
 
-import javax.ws.rs.core.Response.Status;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -26,6 +25,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
 class BucketUpdateIT extends IntegrationHelper {
+
+    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
@@ -46,7 +47,7 @@ class BucketUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{uuid}", uuid)
+            .when().put(ENDPOINT_PATH, uuid)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
@@ -70,7 +71,7 @@ class BucketUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{uuid}", UUID.randomUUID().toString())
+            .when().put(ENDPOINT_PATH, UUID.randomUUID().toString())
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -97,7 +98,7 @@ class BucketUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{notExistentUuid}", notExistentUuid)
+            .when().put(ENDPOINT_PATH, notExistentUuid)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)

@@ -25,6 +25,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BuckeCreationtIT extends IntegrationHelper {
 
+    public static final String ENDPOINT_PATH = "/v1/buckets";
+
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
 
@@ -45,7 +47,7 @@ class BuckeCreationtIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().post("/v1/buckets")
+            .when().post(ENDPOINT_PATH)
             .then()
             .statusCode(CREATED.getStatusCode())
             .header("Location", containsString(String.format("/v1/buckets/%s", uuid)));
@@ -66,7 +68,7 @@ class BuckeCreationtIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().post("/v1/buckets")
+            .when().post(ENDPOINT_PATH)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -86,7 +88,7 @@ class BuckeCreationtIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().post("/v1/buckets")
+            .when().post(ENDPOINT_PATH)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -117,7 +119,7 @@ class BuckeCreationtIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().post("/v1/buckets")
+            .when().post(ENDPOINT_PATH)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)

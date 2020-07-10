@@ -26,6 +26,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BucketMoveIT extends IntegrationHelper {
 
+    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}/move";
+
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
@@ -43,7 +45,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{uuid}/move", uuid)
+            .when().put(ENDPOINT_PATH, uuid)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
@@ -68,7 +70,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put("/v1/buckets/{uuid}/move", UUID.randomUUID().toString())
+            .when().put(ENDPOINT_PATH, UUID.randomUUID().toString())
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -76,6 +78,33 @@ class BucketMoveIT extends IntegrationHelper {
             .body("message", is(errorMessage))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails))
+            .log().body();
+    }
+
+    @Test
+    void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
+
+        // fixture
+        var notExistentUuid = UUID.randomUUID().toString();
+
+        var template = "{" +
+            "  position : @f" +
+            "}";
+
+        var payload = new JsonTemplate(template).prettyString();
+
+        // verify
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload).log().body()
+            .when().put(ENDPOINT_PATH, notExistentUuid)
+            .then()
+            .statusCode(BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Invalid field"))
+            .and().body("errors.field", containsInAnyOrder("code"))
+            .and().body("errors.detail", containsInAnyOrder("1001"))
             .log().body();
     }
 
