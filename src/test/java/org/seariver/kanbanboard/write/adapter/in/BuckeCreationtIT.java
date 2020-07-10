@@ -11,11 +11,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.ws.rs.core.Response.Status;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -46,7 +47,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
-            .statusCode(Status.CREATED.getStatusCode())
+            .statusCode(CREATED.getStatusCode())
             .header("Location", containsString(String.format("/v1/buckets/%s", uuid)));
     }
 
@@ -67,7 +68,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
             .body("message", is("Invalid field"))
@@ -87,7 +88,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
             .body("message", is("Malformed JSON"))
@@ -118,7 +119,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().post("/v1/buckets")
             .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode())
+            .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
             .body("message", is("Invalid field"))
