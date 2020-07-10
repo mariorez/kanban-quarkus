@@ -32,7 +32,7 @@ class BucketMoveIT extends IntegrationHelper {
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
         // fixture
-        var uuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var position = 1.23;
 
         var template = String.format("{" +
@@ -45,12 +45,12 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, uuid)
+            .when().put(ENDPOINT_PATH, validUuid)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByUuid(UUID.fromString(uuid)).get();
+        var actualBucket = repository.findByUuid(UUID.fromString(validUuid)).get();
         assertThat(position).isEqualTo(actualBucket.getPosition());
     }
 
@@ -61,6 +61,8 @@ class BucketMoveIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
+        String validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
             .withValueProducer(new BlankStringValueProducer())
@@ -70,7 +72,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, UUID.randomUUID().toString())
+            .when().put(ENDPOINT_PATH, validUuid)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -85,7 +87,7 @@ class BucketMoveIT extends IntegrationHelper {
     void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
 
         // fixture
-        var notExistentUuid = UUID.randomUUID().toString();
+        var notExistentUuid = "effce142-1a08-49d4-9fe6-3fe728b17a41";
 
         var template = "{" +
             "  position : @f" +
@@ -105,6 +107,34 @@ class BucketMoveIT extends IntegrationHelper {
             .body("message", is("Invalid field"))
             .and().body("errors.field", containsInAnyOrder("code"))
             .and().body("errors.detail", containsInAnyOrder("1001"))
+            .log().body();
+    }
+
+    @Test
+    void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
+
+        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var duplicatedPosition = 100.15;
+
+        // given
+        var template = String.format("{" +
+            "  position : %s" +
+            "}", duplicatedPosition);
+
+        var payload = new JsonTemplate(template).prettyString();
+
+        // verify
+        given()
+            .contentType(ContentType.JSON)
+            .body(payload).log().body()
+            .when().put(ENDPOINT_PATH, validUuid)
+            .then()
+            .statusCode(BAD_REQUEST.getStatusCode())
+            .contentType(ContentType.JSON)
+            .assertThat()
+            .body("message", is("Invalid field"))
+            .and().body("errors.field", containsInAnyOrder("code"))
+            .and().body("errors.detail", containsInAnyOrder("1000"))
             .log().body();
     }
 

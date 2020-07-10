@@ -42,37 +42,26 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
             jdbcTemplate.update(sql, parameters);
 
         } catch (DuplicateKeyException exception) {
-
-            var duplicatedDataException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, exception);
-
-            var existentBuckets = findByUuidOrPosition(bucket.getUuid(), bucket.getPosition());
-
-            existentBuckets.forEach(existentBucket -> {
-
-                if (existentBucket.getUuid().equals(bucket.getUuid())) {
-                    duplicatedDataException.addError("id", bucket.getUuid());
-                }
-
-                if (existentBucket.getPosition() == bucket.getPosition()) {
-                    duplicatedDataException.addError(POSITION_FIELD, bucket.getPosition());
-                }
-            });
-
-            throw duplicatedDataException;
+            duplicatedKeyException(bucket.getUuid(), bucket.getPosition(), exception);
         }
     }
 
     @Override
     public void update(Bucket bucket) {
 
-        var sql = "UPDATE bucket SET position = :position, name =:name WHERE uuid = :uuid";
+        try {
+            var sql = "UPDATE bucket SET position = :position, name =:name WHERE uuid = :uuid";
 
-        MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(UUID_FIELD, bucket.getUuid())
-            .addValue(POSITION_FIELD, bucket.getPosition())
-            .addValue(NAME_FIELD, bucket.getName());
+            MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(UUID_FIELD, bucket.getUuid())
+                .addValue(POSITION_FIELD, bucket.getPosition())
+                .addValue(NAME_FIELD, bucket.getName());
 
-        jdbcTemplate.update(sql, parameters);
+            jdbcTemplate.update(sql, parameters);
+
+        } catch (DuplicateKeyException exception) {
+            duplicatedKeyException(null, bucket.getPosition(), exception);
+        }
     }
 
     public Optional<Bucket> findByUuid(UUID uuid) {
@@ -116,5 +105,25 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
                 .setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime())
                 .setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
         );
+    }
+
+    private void duplicatedKeyException(UUID uuid, double position, DuplicateKeyException exception) {
+
+        var duplicatedDataException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, exception);
+
+        var existentBuckets = findByUuidOrPosition(uuid, position);
+
+        existentBuckets.forEach(existentBucket -> {
+
+            if (existentBucket.getUuid().equals(uuid)) {
+                duplicatedDataException.addError("id", uuid);
+            }
+
+            if (existentBucket.getPosition() == position) {
+                duplicatedDataException.addError(POSITION_FIELD, position);
+            }
+        });
+
+        throw duplicatedDataException;
     }
 }

@@ -62,7 +62,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     }
 
     @ParameterizedTest
-    @MethodSource("invalidDataProvider")
+    @MethodSource("creatingWithDuplicatedDataProvider")
     void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID uuid,
                                                                           double position,
                                                                           Map<String, Object> expectedError) {
@@ -105,6 +105,24 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         assertThat(expectedBucket.getUpdatedAt()).isNotNull();
     }
 
+    @Test
+    void WHEN_UpdatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException() {
+        // given
+        double alreadyExistentPosition = 100.15;
+        var expected = new Bucket()
+            .setUuid(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
+            .setPosition(alreadyExistentPosition)
+            .setName("WHATEVER");
+
+        // then
+        DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.update(expected));
+
+        // when
+        assertThat(exception.getMessage()).isEqualTo("Invalid duplicated data");
+        assertThat(exception.getCode()).isEqualTo(1000);
+        assertThat(exception.getErrors()).containsExactlyInAnyOrderEntriesOf(Map.of("position", alreadyExistentPosition));
+    }
+
     private static Stream<Arguments> validDataProvider() {
         return Stream.of(
             arguments(UUID.randomUUID(),
@@ -116,7 +134,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         );
     }
 
-    private static Stream<Arguments> invalidDataProvider() {
+    private static Stream<Arguments> creatingWithDuplicatedDataProvider() {
 
         var existentUuid = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
         var existentPositionSameRegister = 200.987;
