@@ -26,13 +26,13 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class ColumnUpdateIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}";
+    public static final String ENDPOINT_PATH = "/v1/columns/{uuid}";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
         // fixture
-        var uuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var name = "New Name";
 
         var template = "{" +
@@ -47,12 +47,12 @@ class ColumnUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, uuid)
+            .when().put(ENDPOINT_PATH, existentExternalId)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteColumnRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(uuid)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
         assertThat(name).isEqualTo(actualBucket.getName());
     }
 
@@ -62,6 +62,7 @@ class ColumnUpdateIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
+        String existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
             .withValueProducer(new BlankStringValueProducer())
@@ -71,7 +72,7 @@ class ColumnUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, UUID.randomUUID().toString())
+            .when().put(ENDPOINT_PATH, existentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -86,7 +87,7 @@ class ColumnUpdateIT extends IntegrationHelper {
     void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
 
         // fixture
-        var notExistentUuid = UUID.randomUUID().toString();
+        var notExistentExternalId = UUID.randomUUID().toString();
 
         var template = "{" +
             "  name : @s" +
@@ -98,7 +99,7 @@ class ColumnUpdateIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, notExistentUuid)
+            .when().put(ENDPOINT_PATH, notExistentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
