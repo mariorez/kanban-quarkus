@@ -37,7 +37,7 @@ class WriteCardRepositoryImplTest extends TestHelper {
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
         var expected = new Card()
-            .setBucketId(bucketId)
+            .setColumnId(bucketId)
             .setExternalId(uuid)
             .setPosition(position)
             .setName(name);
@@ -48,7 +48,7 @@ class WriteCardRepositoryImplTest extends TestHelper {
         // then
         var actualOptional = repository.findByUuid(uuid);
         Card actual = actualOptional.get();
-        assertThat(actual.getBucketId()).isEqualTo(bucketId);
+        assertThat(actual.getColumnId()).isEqualTo(bucketId);
         assertThat(actual.getExternalId()).isEqualTo(expected.getExternalId());
         assertThat(actual.getPosition()).isEqualTo(expected.getPosition());
         assertThat(actual.getName()).isEqualTo(expected.getName());

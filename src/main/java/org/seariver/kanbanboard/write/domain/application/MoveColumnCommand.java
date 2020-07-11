@@ -2,12 +2,12 @@ package org.seariver.kanbanboard.write.domain.application;
 
 import java.util.UUID;
 
-public class MoveBucketCommand {
+public class MoveColumnCommand {
 
     private final UUID uuid;
     private final double position;
 
-    public MoveBucketCommand(UUID uuid, double position) {
+    public MoveColumnCommand(UUID uuid, double position) {
         this.uuid = uuid;
         this.position = position;
     }

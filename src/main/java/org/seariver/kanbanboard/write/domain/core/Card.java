@@ -6,7 +6,7 @@ import java.util.UUID;
 public class Card {
 
     private Long id;
-    private Long bucketId;
+    private Long columnId;
     private UUID externalId;
     private double position;
     private String name;
@@ -22,12 +22,12 @@ public class Card {
         return this;
     }
 
-    public Long getBucketId() {
-        return bucketId;
+    public Long getColumnId() {
+        return columnId;
     }
 
-    public Card setBucketId(Long bucketId) {
-        this.bucketId = bucketId;
+    public Card setColumnId(Long columnId) {
+        this.columnId = columnId;
         return this;
     }
 

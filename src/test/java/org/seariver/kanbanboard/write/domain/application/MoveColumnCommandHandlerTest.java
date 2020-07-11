@@ -3,9 +3,9 @@ package org.seariver.kanbanboard.write.domain.application;
 import helper.TestHelper;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.seariver.kanbanboard.write.domain.core.Bucket;
-import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
-import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
+import org.seariver.kanbanboard.write.domain.core.Column;
+import org.seariver.kanbanboard.write.domain.core.WriteColumnRepository;
+import org.seariver.kanbanboard.write.domain.exception.ColumnNotExistentException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
-public class MoveBucketCommandHandlerTest extends TestHelper {
+public class MoveColumnCommandHandlerTest extends TestHelper {
 
     @Test
     void GIVEN_ValidPosition_MUST_UpdateBucketPosition() {
@@ -25,13 +25,13 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
         // given
         var uuid = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(uuid, position);
-        var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setExternalId(uuid).setPosition(123);
+        var command = new MoveColumnCommand(uuid, position);
+        var repository = mock(WriteColumnRepository.class);
+        var bucket = new Column().setExternalId(uuid).setPosition(123);
         when(repository.findByExternalId(uuid)).thenReturn(Optional.of(bucket));
 
         // when
-        var handler = new MoveBucketCommandHandler(repository);
+        var handler = new MoveColumnCommandHandler(repository);
         handler.handle(command);
 
         // then
@@ -47,14 +47,14 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
         // given
         var uuid = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(uuid, position);
-        var repository = mock(WriteBucketRepository.class);
+        var command = new MoveColumnCommand(uuid, position);
+        var repository = mock(WriteColumnRepository.class);
         when(repository.findByExternalId(uuid)).thenReturn(Optional.empty());
 
         // when
-        var handler = new MoveBucketCommandHandler(repository);
+        var handler = new MoveColumnCommandHandler(repository);
         var exception = assertThrows(
-            BucketNotExistentException.class, () -> handler.handle(command));
+            ColumnNotExistentException.class, () -> handler.handle(command));
 
         // then
         verify(repository).findByExternalId(uuid);

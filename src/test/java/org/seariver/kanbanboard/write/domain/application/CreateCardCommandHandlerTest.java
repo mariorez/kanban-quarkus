@@ -4,9 +4,9 @@ import helper.TestHelper;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.seariver.kanbanboard.write.domain.core.Bucket;
+import org.seariver.kanbanboard.write.domain.core.Column;
 import org.seariver.kanbanboard.write.domain.core.Card;
-import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
+import org.seariver.kanbanboard.write.domain.core.WriteColumnRepository;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
 
 import java.util.Optional;
@@ -32,10 +32,10 @@ public class CreateCardCommandHandlerTest extends TestHelper {
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
         CreateCardCommand command = new CreateCardCommand(uuid, bucketUuid, position, name);
-        var bucketRepository = mock(WriteBucketRepository.class);
+        var bucketRepository = mock(WriteColumnRepository.class);
         var cardRepository = mock(WriteCardRepository.class);
         when(bucketRepository.findByExternalId(bucketUuid)).thenReturn(
-            Optional.of(new Bucket().setId(bucketId).setExternalId(bucketUuid)));
+            Optional.of(new Column().setId(bucketId).setExternalId(bucketUuid)));
 
         // when
         CreateCardCommandHandler handler = new CreateCardCommandHandler(bucketRepository, cardRepository);
@@ -45,7 +45,7 @@ public class CreateCardCommandHandlerTest extends TestHelper {
         verify(bucketRepository).findByExternalId(bucketUuid);
         verify(cardRepository).create(captor.capture());
         var card = captor.getValue();
-        assertThat(card.getBucketId()).isEqualTo(bucketId);
+        assertThat(card.getColumnId()).isEqualTo(bucketId);
         assertThat(card.getExternalId()).isEqualTo(uuid);
         assertThat(card.getPosition()).isEqualTo(position);
         assertThat(card.getName()).isEqualTo(name);

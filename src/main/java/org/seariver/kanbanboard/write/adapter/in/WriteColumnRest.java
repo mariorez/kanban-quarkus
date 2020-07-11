@@ -7,12 +7,12 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
-import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
-import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.MoveBucketCommandHandler;
-import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.CreateColumnCommand;
+import org.seariver.kanbanboard.write.domain.application.CreateColumnCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.MoveColumnCommand;
+import org.seariver.kanbanboard.write.domain.application.MoveColumnCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.UpdateColumnCommand;
+import org.seariver.kanbanboard.write.domain.application.UpdateColumnCommandHandler;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -30,20 +30,20 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
-@Path("v1/buckets")
+@Path("v1/columns")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "bucket")
-public class WriteBucketRest {
+@Tag(name = "columns")
+public class WriteColumnRest {
 
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid uuid format";
     @Inject
-    private CreateBucketCommandHandler createHandler;
+    private CreateColumnCommandHandler createHandler;
     @Inject
-    private UpdateBucketCommandHandler updateHandler;
+    private UpdateColumnCommandHandler updateHandler;
     @Inject
-    private MoveBucketCommandHandler moveHandler;
+    private MoveColumnCommandHandler moveHandler;
 
     @POST
     @APIResponse(responseCode = "201", description = "Bucket created successful")
@@ -51,7 +51,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(@Valid CreateInput input) {
 
-        var command = new CreateBucketCommand(UUID.fromString(input.uuid), input.position, input.name);
+        var command = new CreateColumnCommand(UUID.fromString(input.uuid), input.position, input.name);
         createHandler.handle(command);
 
         return Response.created(URI.create(String.format("v1/buckets/%s", input.uuid))).build();
@@ -68,7 +68,7 @@ public class WriteBucketRest {
         @PathParam("uuid") String uuid,
         @Valid UpdateInput input) {
 
-        var command = new UpdateBucketCommand(UUID.fromString(uuid), input.name);
+        var command = new UpdateColumnCommand(UUID.fromString(uuid), input.name);
         updateHandler.handle(command);
 
         return Response.noContent().build();
@@ -85,7 +85,7 @@ public class WriteBucketRest {
         @PathParam("uuid") String uuid,
         @Valid MoveInput input) {
 
-        var command = new MoveBucketCommand(UUID.fromString(uuid), input.position);
+        var command = new MoveColumnCommand(UUID.fromString(uuid), input.position);
         moveHandler.handle(command);
 
         return Response.noContent().build();

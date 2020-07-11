@@ -1,7 +1,7 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
-import org.seariver.kanbanboard.write.domain.core.Bucket;
-import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
+import org.seariver.kanbanboard.write.domain.core.Column;
+import org.seariver.kanbanboard.write.domain.core.WriteColumnRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,7 +16,7 @@ import java.util.UUID;
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.INVALID_DUPLICATED_DATA;
 
 @Singleton
-public class WriteBucketRepositoryImpl implements WriteBucketRepository {
+public class WriteColumnRepositoryImpl implements WriteColumnRepository {
 
     public static final String POSITION_FIELD = "position";
     public static final String EXTERNAL_ID = "external_id";
@@ -24,49 +24,49 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public WriteBucketRepositoryImpl(DataSource dataSource) {
+    public WriteColumnRepositoryImpl(DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     @Override
-    public void create(Bucket bucket) {
+    public void create(Column column) {
 
         try {
-            var sql = "INSERT INTO bucket(external_id, position, name) values (:external_id, :position, :name)";
+            var sql = "INSERT INTO board_column(external_id, position, name) values (:external_id, :position, :name)";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(EXTERNAL_ID, bucket.getExternalId())
-                .addValue(POSITION_FIELD, bucket.getPosition())
-                .addValue(NAME_FIELD, bucket.getName());
+                .addValue(EXTERNAL_ID, column.getExternalId())
+                .addValue(POSITION_FIELD, column.getPosition())
+                .addValue(NAME_FIELD, column.getName());
 
             jdbcTemplate.update(sql, parameters);
 
         } catch (DuplicateKeyException exception) {
-            duplicatedKeyException(bucket.getExternalId(), bucket.getPosition(), exception);
+            duplicatedKeyException(column.getExternalId(), column.getPosition(), exception);
         }
     }
 
     @Override
-    public void update(Bucket bucket) {
+    public void update(Column column) {
 
         try {
-            var sql = "UPDATE bucket SET position = :position, name =:name WHERE external_id = :external_id";
+            var sql = "UPDATE board_column SET position = :position, name =:name WHERE external_id = :external_id";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(EXTERNAL_ID, bucket.getExternalId())
-                .addValue(POSITION_FIELD, bucket.getPosition())
-                .addValue(NAME_FIELD, bucket.getName());
+                .addValue(EXTERNAL_ID, column.getExternalId())
+                .addValue(POSITION_FIELD, column.getPosition())
+                .addValue(NAME_FIELD, column.getName());
 
             jdbcTemplate.update(sql, parameters);
 
         } catch (DuplicateKeyException exception) {
-            duplicatedKeyException(null, bucket.getPosition(), exception);
+            duplicatedKeyException(null, column.getPosition(), exception);
         }
     }
 
-    public Optional<Bucket> findByExternalId(UUID uuid) {
+    public Optional<Column> findByExternalId(UUID uuid) {
 
-        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id";
+        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM board_column WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
             .addValue(EXTERNAL_ID, uuid);
@@ -74,7 +74,7 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
-                return Optional.of(new Bucket()
+                return Optional.of(new Column()
                     .setId(resultSet.getLong("id"))
                     .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
                     .setPosition(resultSet.getDouble(POSITION_FIELD))
@@ -88,16 +88,16 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         });
     }
 
-    public List<Bucket> findByExternalIdOrPosition(UUID uuid, double position) {
+    public List<Column> findByExternalIdOrPosition(UUID uuid, double position) {
 
-        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id OR position = :position";
+        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM board_column WHERE external_id = :external_id OR position = :position";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
             .addValue(EXTERNAL_ID, uuid)
             .addValue(POSITION_FIELD, position);
 
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
-            new Bucket()
+            new Column()
                 .setId(rs.getLong("id"))
                 .setExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
                 .setPosition(rs.getDouble(POSITION_FIELD))

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.seariver.kanbanboard.write.adapter.out.WriteBucketRepositoryImpl;
+import org.seariver.kanbanboard.write.adapter.out.WriteColumnRepositoryImpl;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -24,45 +24,44 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-class BucketMoveIT extends IntegrationHelper {
+class ColumnUpdateIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}/move";
+    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
         // fixture
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-        var position = 1.23;
+        var uuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var name = "New Name";
 
-        var template = String.format("{" +
-            "  position : %s" +
-            "}", position);
+        var template = "{" +
+            "  name : $name" +
+            "}";
 
-        var payload = new JsonTemplate(template).prettyString();
+        var payload = new JsonTemplate(template)
+            .withVar("name", name)
+            .prettyString();
 
         // verify
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, uuid)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
-        var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(validUuid)).get();
-        assertThat(position).isEqualTo(actualBucket.getPosition());
+        var repository = new WriteColumnRepositoryImpl(dataSource);
+        var actualBucket = repository.findByExternalId(UUID.fromString(uuid)).get();
+        assertThat(name).isEqualTo(actualBucket.getName());
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidData")
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
-                                                 String errorMessage,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
-        String validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
             .withValueProducer(new BlankStringValueProducer())
@@ -72,12 +71,12 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, UUID.randomUUID().toString())
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is(errorMessage))
+            .body("message", is("Invalid field"))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails))
             .log().body();
@@ -87,10 +86,10 @@ class BucketMoveIT extends IntegrationHelper {
     void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
 
         // fixture
-        var notExistentUuid = "effce142-1a08-49d4-9fe6-3fe728b17a41";
+        var notExistentUuid = UUID.randomUUID().toString();
 
         var template = "{" +
-            "  position : @f" +
+            "  name : @s" +
             "}";
 
         var payload = new JsonTemplate(template).prettyString();
@@ -110,47 +109,17 @@ class BucketMoveIT extends IntegrationHelper {
             .log().body();
     }
 
-    @Test
-    void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
-
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-        var duplicatedPosition = 100.15;
-
-        // given
-        var template = String.format("{" +
-            "  position : %s" +
-            "}", duplicatedPosition);
-
-        var payload = new JsonTemplate(template).prettyString();
-
-        // verify
-        given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Invalid field"))
-            .and().body("errors.field", containsInAnyOrder("code"))
-            .and().body("errors.detail", containsInAnyOrder("1000"))
-            .log().body();
-    }
-
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
-            arguments("{position:null}", "Invalid field",
-                args("position"), args("must be greater than 0")),
-            arguments("{position:@s}", "Invalid format",
-                args("position"), args("double")),
-            arguments("{position:0}", "Invalid field",
-                args("position"), args("must be greater than 0")),
-            arguments("{position:-1}", "Invalid field",
-                args("position"), args("must be greater than 0")),
-            arguments("{notExistent:@f}", "Invalid field",
-                args("position"), args("must be greater than 0"))
+            arguments("{name:null}",
+                args("name"), args("must not be blank")),
+            arguments("{name:@s(length=0)}",
+                args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
+            arguments("{name:@blank}",
+                args("name"), args("must not be blank")),
+            arguments("{notExistent:@s}",
+                args("name"), args("must not be blank"))
         );
     }
 }

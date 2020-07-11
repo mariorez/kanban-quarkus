@@ -8,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.seariver.kanbanboard.write.adapter.DataSourceMock;
-import org.seariver.kanbanboard.write.domain.core.Bucket;
-import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
+import org.seariver.kanbanboard.write.domain.core.Column;
+import org.seariver.kanbanboard.write.domain.core.WriteColumnRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
 
 import java.time.LocalDateTime;
@@ -22,18 +22,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @Tag("unit")
-class WriteBucketRepositoryImplTest extends TestHelper {
+class WriteColumnRepositoryImplTest extends TestHelper {
 
-    private WriteBucketRepositoryImpl repository;
+    private WriteColumnRepositoryImpl repository;
 
     @BeforeEach
     void setup() {
-        repository = new WriteBucketRepositoryImpl(new DataSourceMock());
+        repository = new WriteColumnRepositoryImpl(new DataSourceMock());
     }
 
     @Test
     void MUST_ImplementInterface() {
-        assertThat(repository).isInstanceOf(WriteBucketRepository.class);
+        assertThat(repository).isInstanceOf(WriteColumnRepository.class);
     }
 
     @ParameterizedTest
@@ -42,7 +42,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
                                                                     double position,
                                                                     String name) {
         // given
-        var expected = new Bucket()
+        var expected = new Column()
             .setExternalId(externalId)
             .setPosition(position)
             .setName(name);
@@ -67,7 +67,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
                                                                           double position,
                                                                           Map<String, Object> expectedError) {
         // given
-        var expected = new Bucket()
+        var expected = new Column()
             .setExternalId(uuid)
             .setPosition(position)
             .setName("WHATEVER");
@@ -109,7 +109,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     void WHEN_UpdatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException() {
         // given
         double alreadyExistentPosition = 100.15;
-        var expected = new Bucket()
+        var expected = new Column()
             .setExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
             .setPosition(alreadyExistentPosition)
             .setName("WHATEVER");

@@ -3,7 +3,7 @@ package org.seariver.kanbanboard.write.domain.core;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Bucket {
+public class Column {
 
     private Long id;
     private UUID externalId;
@@ -16,7 +16,7 @@ public class Bucket {
         return id;
     }
 
-    public Bucket setId(Long id) {
+    public Column setId(Long id) {
         this.id = id;
         return this;
     }
@@ -25,7 +25,7 @@ public class Bucket {
         return externalId;
     }
 
-    public Bucket setExternalId(UUID externalId) {
+    public Column setExternalId(UUID externalId) {
         this.externalId = externalId;
         return this;
     }
@@ -34,7 +34,7 @@ public class Bucket {
         return position;
     }
 
-    public Bucket setPosition(double position) {
+    public Column setPosition(double position) {
         this.position = position;
         return this;
     }
@@ -43,7 +43,7 @@ public class Bucket {
         return name;
     }
 
-    public Bucket setName(String name) {
+    public Column setName(String name) {
         this.name = name;
         return this;
     }
@@ -52,7 +52,7 @@ public class Bucket {
         return createdAt;
     }
 
-    public Bucket setCreatedAt(LocalDateTime createdAt) {
+    public Column setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
     }
@@ -61,7 +61,7 @@ public class Bucket {
         return updatedAt;
     }
 
-    public Bucket setUpdatedAt(LocalDateTime updatedAt) {
+    public Column setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
         return this;
     }

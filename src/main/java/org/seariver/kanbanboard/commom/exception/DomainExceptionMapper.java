@@ -11,7 +11,7 @@ import java.util.List;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Provider
-public class WriteDomainExceptionMapper implements ExceptionMapper<DomainException> {
+public class DomainExceptionMapper implements ExceptionMapper<DomainException> {
 
     public static final String INVALID_FIELD_MESSAGE = "Invalid field";
 

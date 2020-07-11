@@ -16,7 +16,7 @@ class DomainExceptionTest extends TestHelper {
 
         // given
         var duplicatedDataException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, new RuntimeException());
-        var bucketNotExistentException = new BucketNotExistentException(BUCKET_NOT_EXIST);
+        var bucketNotExistentException = new ColumnNotExistentException(BUCKET_NOT_EXIST);
 
         // then
         assertThat(duplicatedDataException).isInstanceOf(DomainException.class);
