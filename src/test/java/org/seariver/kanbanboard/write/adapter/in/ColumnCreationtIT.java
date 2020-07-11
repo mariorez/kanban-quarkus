@@ -23,24 +23,24 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-class BuckeCreationtIT extends IntegrationHelper {
+class ColumnCreationtIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets";
+    public static final String ENDPOINT_PATH = "/v1/columns";
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
 
         // fixture
-        var uuid = UUID.randomUUID().toString();
+        var externalId = UUID.randomUUID().toString();
 
         var template = "{" +
-            "  uuid : $uuid," +
+            "  id : $externalId," +
             "  position : @f," +
             "  name : @s" +
             "}";
 
         var payload = new JsonTemplate(template)
-            .withVar("uuid", uuid)
+            .withVar("externalId", externalId)
             .prettyString();
 
         // verify
@@ -50,7 +50,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .when().post(ENDPOINT_PATH)
             .then()
             .statusCode(CREATED.getStatusCode())
-            .header("Location", containsString(String.format("/v1/buckets/%s", uuid)));
+            .header("Location", containsString(String.format("/v1/columns/%s", externalId)));
     }
 
     @ParameterizedTest
@@ -100,18 +100,18 @@ class BuckeCreationtIT extends IntegrationHelper {
     @Test
     void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
 
-        var duplicatedUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var duplicatedExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var duplicatedPosition = 100.15;
 
         // given
         var template = "{" +
-            "  uuid : $uuid," +
+            "  id : $externalId," +
             "  position : $position," +
             "  name : @s" +
             "}";
 
         var payload = new JsonTemplate(template)
-            .withVar("uuid", duplicatedUuid)
+            .withVar("externalId", duplicatedExternalId)
             .withVar("position", duplicatedPosition)
             .prettyString();
 
@@ -134,34 +134,34 @@ class BuckeCreationtIT extends IntegrationHelper {
 
         return Stream.of(
             arguments(
-                "{uuid:null, position:@f, name:@s}",
-                args("uuid"), args("must not be blank")),
+                "{id:null, position:@f, name:@s}",
+                args("externalId"), args("must not be blank")),
             arguments(
-                "{uuid:@s(length=0), position:@f, name:@s}",
-                args("uuid", "uuid"), args("must not be blank", "invalid uuid format")),
+                "{id:@s(length=0), position:@f, name:@s}",
+                args("externalId", "externalId"), args("must not be blank", "invalid uuid format")),
             arguments(
-                "{uuid:@s(foobar), position:@f, name:@s}",
-                args("uuid"), args("invalid uuid format")),
+                "{id:@s(foobar), position:@f, name:@s}",
+                args("externalId"), args("invalid uuid format")),
             arguments(
                 "{notExistent:@s, position:@f, name:@s}",
-                args("uuid"), args("must not be blank")),
+                args("externalId"), args("must not be blank")),
             arguments(
-                "{uuid:@uuid, position:@f(-1), name:@s}",
+                "{id:@uuid, position:@f(-1), name:@s}",
                 args("position"), args("must be greater than 0")),
             arguments(
-                "{uuid:@uuid, position:@f(0), name:@s}",
+                "{id:@uuid, position:@f(0), name:@s}",
                 args("position"), args("must be greater than 0")),
             arguments(
-                "{uuid:@uuid, position:@f, name:null}",
+                "{id:@uuid, position:@f, name:null}",
                 args("name"), args("must not be blank")),
             arguments(
-                "{uuid:@uuid, position:@f, name:@s(length=0)}",
+                "{id:@uuid, position:@f, name:@s(length=0)}",
                 args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
             arguments(
-                "{uuid:@uuid, position:@f, name:@blank}",
+                "{id:@uuid, position:@f, name:@blank}",
                 args("name"), args("must not be blank")),
             arguments(
-                "{uuid:@uuid, position:@f, name:@s(length=101)}",
+                "{id:@uuid, position:@f, name:@s(length=101)}",
                 args("name"), args("size must be between 1 and 100"))
         );
     }

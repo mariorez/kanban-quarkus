@@ -1,6 +1,7 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -51,10 +52,10 @@ public class WriteColumnRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(@Valid CreateInput input) {
 
-        var command = new CreateColumnCommand(UUID.fromString(input.uuid), input.position, input.name);
+        var command = new CreateColumnCommand(UUID.fromString(input.externalId), input.position, input.name);
         createHandler.handle(command);
 
-        return Response.created(URI.create(String.format("v1/buckets/%s", input.uuid))).build();
+        return Response.created(URI.create(String.format("v1/columns/%s", input.externalId))).build();
     }
 
     @PUT
@@ -95,7 +96,8 @@ public class WriteColumnRest {
     static class CreateInput {
         @NotBlank
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        public String uuid;
+        @JsonProperty("id")
+        public String externalId;
         @Positive
         public double position;
         @NotBlank
