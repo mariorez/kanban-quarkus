@@ -26,13 +26,13 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class ColumnMoveIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}/move";
+    public static final String ENDPOINT_PATH = "/v1/columns/{uuid}/move";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
         // fixture
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var validExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var position = 1.23;
 
         var template = String.format("{" +
@@ -45,12 +45,12 @@ class ColumnMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, validExternalId)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteColumnRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(validUuid)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(validExternalId)).get();
         assertThat(position).isEqualTo(actualBucket.getPosition());
     }
 
@@ -61,7 +61,7 @@ class ColumnMoveIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
-        String validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        String validExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
 
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
@@ -72,7 +72,7 @@ class ColumnMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, validExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -87,7 +87,7 @@ class ColumnMoveIT extends IntegrationHelper {
     void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
 
         // fixture
-        var notExistentUuid = "effce142-1a08-49d4-9fe6-3fe728b17a41";
+        var notExistentExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
 
         var template = "{" +
             "  position : @f" +
@@ -99,7 +99,7 @@ class ColumnMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, notExistentUuid)
+            .when().put(ENDPOINT_PATH, notExistentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -113,7 +113,7 @@ class ColumnMoveIT extends IntegrationHelper {
     @Test
     void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
 
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var validEnternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var duplicatedPosition = 100.15;
 
         // given
@@ -127,7 +127,7 @@ class ColumnMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, validEnternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
