@@ -19,7 +19,7 @@ import static org.seariver.kanbanboard.write.domain.exception.DomainException.Er
 public class WriteBucketRepositoryImpl implements WriteBucketRepository {
 
     public static final String POSITION_FIELD = "position";
-    public static final String UUID_FIELD = "uuid";
+    public static final String EXTERNAL_ID = "external_id";
     public static final String NAME_FIELD = "name";
 
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -32,17 +32,17 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
     public void create(Bucket bucket) {
 
         try {
-            var sql = "INSERT INTO bucket(uuid, position, name) values (:uuid, :position, :name)";
+            var sql = "INSERT INTO bucket(external_id, position, name) values (:external_id, :position, :name)";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(UUID_FIELD, bucket.getUuid())
+                .addValue(EXTERNAL_ID, bucket.getExternalId())
                 .addValue(POSITION_FIELD, bucket.getPosition())
                 .addValue(NAME_FIELD, bucket.getName());
 
             jdbcTemplate.update(sql, parameters);
 
         } catch (DuplicateKeyException exception) {
-            duplicatedKeyException(bucket.getUuid(), bucket.getPosition(), exception);
+            duplicatedKeyException(bucket.getExternalId(), bucket.getPosition(), exception);
         }
     }
 
@@ -50,10 +50,10 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
     public void update(Bucket bucket) {
 
         try {
-            var sql = "UPDATE bucket SET position = :position, name =:name WHERE uuid = :uuid";
+            var sql = "UPDATE bucket SET position = :position, name =:name WHERE external_id = :external_id";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(UUID_FIELD, bucket.getUuid())
+                .addValue(EXTERNAL_ID, bucket.getExternalId())
                 .addValue(POSITION_FIELD, bucket.getPosition())
                 .addValue(NAME_FIELD, bucket.getName());
 
@@ -64,19 +64,19 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         }
     }
 
-    public Optional<Bucket> findByUuid(UUID uuid) {
+    public Optional<Bucket> findByExternalId(UUID uuid) {
 
-        var sql = "SELECT id, uuid, position, name, created_at, updated_at FROM bucket WHERE uuid = :uuid";
+        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(UUID_FIELD, uuid);
+            .addValue(EXTERNAL_ID, uuid);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
                 return Optional.of(new Bucket()
                     .setId(resultSet.getLong("id"))
-                    .setUuid(UUID.fromString(resultSet.getString(UUID_FIELD)))
+                    .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
                     .setPosition(resultSet.getDouble(POSITION_FIELD))
                     .setName(resultSet.getString(NAME_FIELD))
                     .setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime())
@@ -88,18 +88,18 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         });
     }
 
-    public List<Bucket> findByUuidOrPosition(UUID uuid, double position) {
+    public List<Bucket> findByExternalIdOrPosition(UUID uuid, double position) {
 
-        var sql = "SELECT id, uuid, position, name, created_at, updated_at FROM bucket WHERE uuid = :uuid OR position = :position";
+        var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id OR position = :position";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(UUID_FIELD, uuid)
+            .addValue(EXTERNAL_ID, uuid)
             .addValue(POSITION_FIELD, position);
 
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
             new Bucket()
                 .setId(rs.getLong("id"))
-                .setUuid(UUID.fromString(rs.getString(UUID_FIELD)))
+                .setExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
                 .setPosition(rs.getDouble(POSITION_FIELD))
                 .setName(rs.getString(NAME_FIELD))
                 .setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime())
@@ -111,11 +111,11 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
 
         var duplicatedDataException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, exception);
 
-        var existentBuckets = findByUuidOrPosition(uuid, position);
+        var existentBuckets = findByExternalIdOrPosition(uuid, position);
 
         existentBuckets.forEach(existentBucket -> {
 
-            if (existentBucket.getUuid().equals(uuid)) {
+            if (existentBucket.getExternalId().equals(uuid)) {
                 duplicatedDataException.addError("id", uuid);
             }
 

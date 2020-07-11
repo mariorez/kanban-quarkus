@@ -14,7 +14,7 @@ import java.util.UUID;
 public class WriteCardRepositoryImpl implements WriteCardRepository {
 
     public static final String BUCKET_ID_FIELD = "bucket_id";
-    public static final String UUID_FIELD = "uuid";
+    public static final String EXTERNAL_ID = "external_id";
     public static final String POSITION_FIELD = "position";
     public static final String NAME_FIELD = "name";
     public static final String CREATED_AT_FIELD = "created_at";
@@ -28,11 +28,11 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
 
     @Override
     public void create(Card card) {
-        var sql = "INSERT INTO card (bucket_id, uuid, position, name) values (:bucket_id, :uuid, :position, :name)";
+        var sql = "INSERT INTO card (bucket_id, external_id, position, name) values (:bucket_id, :external_id, :position, :name)";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
             .addValue(BUCKET_ID_FIELD, card.getBucketId())
-            .addValue(UUID_FIELD, card.getUuid())
+            .addValue(EXTERNAL_ID, card.getExternalId())
             .addValue(POSITION_FIELD, card.getPosition())
             .addValue(NAME_FIELD, card.getName());
 
@@ -42,17 +42,17 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     @Override
     public Optional<Card> findByUuid(UUID uuid) {
 
-        var sql = "SELECT bucket_id, uuid, position, name, created_at, updated_at FROM card WHERE uuid = :uuid";
+        var sql = "SELECT bucket_id, external_id, position, name, created_at, updated_at FROM card WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(UUID_FIELD, uuid);
+            .addValue(EXTERNAL_ID, uuid);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
                 return Optional.of(new Card()
                     .setBucketId(resultSet.getLong(BUCKET_ID_FIELD))
-                    .setUuid(UUID.fromString(resultSet.getString(UUID_FIELD)))
+                    .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
                     .setPosition(resultSet.getDouble(POSITION_FIELD))
                     .setName(resultSet.getString(NAME_FIELD))
                     .setCreatedAt(resultSet.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())

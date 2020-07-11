@@ -35,7 +35,7 @@ public class CreateBucketCommandHandlerTest extends TestHelper {
         // then
         verify(repository).create(captor.capture());
         var bucket = captor.getValue();
-        assertThat(bucket.getUuid()).isEqualTo(uuid);
+        assertThat(bucket.getExternalId()).isEqualTo(uuid);
         assertThat(bucket.getPosition()).isEqualTo(position);
         assertThat(bucket.getName()).isEqualTo(name);
     }

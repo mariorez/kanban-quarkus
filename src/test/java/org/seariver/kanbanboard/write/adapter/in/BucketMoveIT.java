@@ -50,7 +50,7 @@ class BucketMoveIT extends IntegrationHelper {
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByUuid(UUID.fromString(validUuid)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(validUuid)).get();
         assertThat(position).isEqualTo(actualBucket.getPosition());
     }
 

@@ -52,7 +52,7 @@ class BucketUpdateIT extends IntegrationHelper {
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByUuid(UUID.fromString(uuid)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(uuid)).get();
         assertThat(name).isEqualTo(actualBucket.getName());
     }
 

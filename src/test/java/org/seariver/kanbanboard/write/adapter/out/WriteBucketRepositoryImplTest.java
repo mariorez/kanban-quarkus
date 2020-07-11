@@ -38,12 +38,12 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("validDataProvider")
-    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID uuid,
+    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID externalId,
                                                                     double position,
                                                                     String name) {
         // given
         var expected = new Bucket()
-            .setUuid(uuid)
+            .setExternalId(externalId)
             .setPosition(position)
             .setName(name);
 
@@ -51,10 +51,10 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.create(expected);
 
         // then
-        var actualOptional = repository.findByUuid(uuid);
+        var actualOptional = repository.findByExternalId(externalId);
         var actual = actualOptional.get();
         assertThat(actual.getId()).isPositive();
-        assertThat(actual.getUuid()).isEqualTo(expected.getUuid());
+        assertThat(actual.getExternalId()).isEqualTo(expected.getExternalId());
         assertThat(actual.getPosition()).isEqualTo(expected.getPosition());
         assertThat(actual.getName()).isEqualTo(expected.getName());
         assertThat(actual.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -68,7 +68,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
                                                                           Map<String, Object> expectedError) {
         // given
         var expected = new Bucket()
-            .setUuid(uuid)
+            .setExternalId(uuid)
             .setPosition(position)
             .setName("WHATEVER");
 
@@ -85,7 +85,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     void WHEN_UpdatingBucket_WITH_ValidData_MUST_SaveOnDatabase() {
         // given
         var uuid = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
-        var actualBucket = repository.findByUuid(uuid).get();
+        var actualBucket = repository.findByExternalId(uuid).get();
         assertThat(actualBucket.getPosition()).isEqualTo(200.987);
         assertThat(actualBucket.getName()).isEqualTo("SECOND-BUCKET");
 
@@ -97,8 +97,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.update(actualBucket);
 
         // then
-        var expectedBucket = repository.findByUuid(uuid).get();
-        assertThat(expectedBucket.getUuid()).isEqualTo(uuid);
+        var expectedBucket = repository.findByExternalId(uuid).get();
+        assertThat(expectedBucket.getExternalId()).isEqualTo(uuid);
         assertThat(expectedBucket.getPosition()).isEqualTo(position);
         assertThat(expectedBucket.getName()).isEqualTo(name);
         assertThat(expectedBucket.getCreatedAt()).isNotNull();
@@ -110,7 +110,7 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         // given
         double alreadyExistentPosition = 100.15;
         var expected = new Bucket()
-            .setUuid(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
+            .setExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
             .setPosition(alreadyExistentPosition)
             .setName("WHATEVER");
 
@@ -124,13 +124,15 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     }
 
     private static Stream<Arguments> validDataProvider() {
+
+        var positionAsInteger = faker.number().randomDigitNotZero();
+        var positionAsDouble = faker.number().randomDouble(3, 1, 10);
+        var newName = faker.pokemon().name();
+        var existentName = "FIRST-BUCKET";
+
         return Stream.of(
-            arguments(UUID.randomUUID(),
-                faker.number().randomDigitNotZero(),
-                faker.pokemon().name()),
-            arguments(UUID.randomUUID(),
-                faker.number().randomDouble(3, 1, 10),
-                "EXISTENT NAME")
+            arguments(UUID.randomUUID(), positionAsInteger, newName),
+            arguments(UUID.randomUUID(), positionAsDouble, existentName)
         );
     }
 

@@ -27,17 +27,17 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
         var name = faker.pokemon().name();
         var command = new UpdateBucketCommand(uuid, name);
         var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setUuid(uuid).setPosition(123).setName("FOOBAR");
-        when(repository.findByUuid(uuid)).thenReturn(Optional.of(bucket));
+        var bucket = new Bucket().setExternalId(uuid).setPosition(123).setName("FOOBAR");
+        when(repository.findByExternalId(uuid)).thenReturn(Optional.of(bucket));
 
         // when
         var handler = new UpdateBucketCommandHandler(repository);
         handler.handle(command);
 
         // then
-        verify(repository).findByUuid(uuid);
+        verify(repository).findByExternalId(uuid);
         verify(repository).update(bucket);
-        assertThat(bucket.getUuid()).isEqualTo(uuid);
+        assertThat(bucket.getExternalId()).isEqualTo(uuid);
         assertThat(bucket.getName()).isEqualTo(name);
     }
 
@@ -48,14 +48,14 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
         var uuid = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
         var command = new UpdateBucketCommand(uuid, "WHATEVER");
         var repository = mock(WriteBucketRepository.class);
-        when(repository.findByUuid(uuid)).thenReturn(Optional.empty());
+        when(repository.findByExternalId(uuid)).thenReturn(Optional.empty());
 
         // when
         var handler = new UpdateBucketCommandHandler(repository);
         var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
 
         // then
-        verify(repository).findByUuid(uuid);
+        verify(repository).findByExternalId(uuid);
         assertThat(exception.getMessage()).isEqualTo("Bucket not exist");
     }
 }

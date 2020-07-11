@@ -34,19 +34,19 @@ public class CreateCardCommandHandlerTest extends TestHelper {
         CreateCardCommand command = new CreateCardCommand(uuid, bucketUuid, position, name);
         var bucketRepository = mock(WriteBucketRepository.class);
         var cardRepository = mock(WriteCardRepository.class);
-        when(bucketRepository.findByUuid(bucketUuid)).thenReturn(
-            Optional.of(new Bucket().setId(bucketId).setUuid(bucketUuid)));
+        when(bucketRepository.findByExternalId(bucketUuid)).thenReturn(
+            Optional.of(new Bucket().setId(bucketId).setExternalId(bucketUuid)));
 
         // when
         CreateCardCommandHandler handler = new CreateCardCommandHandler(bucketRepository, cardRepository);
         handler.handle(command);
 
         // then
-        verify(bucketRepository).findByUuid(bucketUuid);
+        verify(bucketRepository).findByExternalId(bucketUuid);
         verify(cardRepository).create(captor.capture());
         var card = captor.getValue();
         assertThat(card.getBucketId()).isEqualTo(bucketId);
-        assertThat(card.getUuid()).isEqualTo(uuid);
+        assertThat(card.getExternalId()).isEqualTo(uuid);
         assertThat(card.getPosition()).isEqualTo(position);
         assertThat(card.getName()).isEqualTo(name);
     }
