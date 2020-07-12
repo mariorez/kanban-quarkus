@@ -64,12 +64,12 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         }
     }
 
-    public Optional<Bucket> findByExternalId(UUID uuid) {
+    public Optional<Bucket> findByExternalId(UUID externalId) {
 
         var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(EXTERNAL_ID, uuid);
+            .addValue(EXTERNAL_ID, externalId);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
@@ -88,12 +88,12 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         });
     }
 
-    public List<Bucket> findByExternalIdOrPosition(UUID uuid, double position) {
+    public List<Bucket> findByExternalIdOrPosition(UUID externalId, double position) {
 
         var sql = "SELECT id, external_id, position, name, created_at, updated_at FROM bucket WHERE external_id = :external_id OR position = :position";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(EXTERNAL_ID, uuid)
+            .addValue(EXTERNAL_ID, externalId)
             .addValue(POSITION_FIELD, position);
 
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
@@ -107,16 +107,16 @@ public class WriteBucketRepositoryImpl implements WriteBucketRepository {
         );
     }
 
-    private void duplicatedKeyException(UUID uuid, double position, DuplicateKeyException exception) {
+    private void duplicatedKeyException(UUID externalId, double position, DuplicateKeyException exception) {
 
         var duplicatedDataException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, exception);
 
-        var existentBuckets = findByExternalIdOrPosition(uuid, position);
+        var existentBuckets = findByExternalIdOrPosition(externalId, position);
 
         existentBuckets.forEach(existentBucket -> {
 
-            if (existentBucket.getExternalId().equals(uuid)) {
-                duplicatedDataException.addError("id", uuid);
+            if (existentBucket.getExternalId().equals(externalId)) {
+                duplicatedDataException.addError("id", externalId);
             }
 
             if (existentBucket.getPosition() == position) {

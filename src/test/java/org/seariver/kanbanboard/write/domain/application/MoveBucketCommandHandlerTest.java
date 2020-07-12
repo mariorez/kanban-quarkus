@@ -23,21 +23,21 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
     void GIVEN_ValidPosition_MUST_UpdateBucketPosition() {
 
         // given
-        var uuid = UUID.randomUUID();
+        var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(uuid, position);
+        var command = new MoveBucketCommand(externalId, position);
         var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setExternalId(uuid).setPosition(123);
-        when(repository.findByExternalId(uuid)).thenReturn(Optional.of(bucket));
+        var bucket = new Bucket().setExternalId(externalId).setPosition(123);
+        when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
 
         // when
         var handler = new MoveBucketCommandHandler(repository);
         handler.handle(command);
 
         // then
-        verify(repository).findByExternalId(uuid);
+        verify(repository).findByExternalId(externalId);
         verify(repository).update(bucket);
-        assertThat(bucket.getExternalId()).isEqualTo(uuid);
+        assertThat(bucket.getExternalId()).isEqualTo(externalId);
         assertThat(bucket.getPosition()).isEqualTo(position);
     }
 
@@ -45,11 +45,11 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
     void GIVEN_NotExistentUuid_MUST_ThrowException() {
 
         // given
-        var uuid = UUID.randomUUID();
+        var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(uuid, position);
+        var command = new MoveBucketCommand(externalId, position);
         var repository = mock(WriteBucketRepository.class);
-        when(repository.findByExternalId(uuid)).thenReturn(Optional.empty());
+        when(repository.findByExternalId(externalId)).thenReturn(Optional.empty());
 
         // when
         var handler = new MoveBucketCommandHandler(repository);
@@ -57,7 +57,7 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
             BucketNotExistentException.class, () -> handler.handle(command));
 
         // then
-        verify(repository).findByExternalId(uuid);
+        verify(repository).findByExternalId(externalId);
         assertThat(exception.getMessage()).isEqualTo("Bucket not exist");
     }
 }

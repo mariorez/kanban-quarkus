@@ -4,16 +4,16 @@ import java.util.UUID;
 
 public class MoveBucketCommand {
 
-    private final UUID uuid;
+    private final UUID externalId;
     private final double position;
 
-    public MoveBucketCommand(UUID uuid, double position) {
-        this.uuid = uuid;
+    public MoveBucketCommand(UUID externalId, double position) {
+        this.externalId = externalId;
         this.position = position;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public double getPosition() {

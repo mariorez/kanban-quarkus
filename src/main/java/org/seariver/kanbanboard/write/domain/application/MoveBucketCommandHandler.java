@@ -18,7 +18,7 @@ public class MoveBucketCommandHandler {
 
     public void handle(MoveBucketCommand command) {
 
-        var optionalBucket = repository.findByExternalId(command.getUuid());
+        var optionalBucket = repository.findByExternalId(command.getExternalId());
 
         if (optionalBucket.isEmpty()) {
             throw new BucketNotExistentException(BUCKET_NOT_EXIST);

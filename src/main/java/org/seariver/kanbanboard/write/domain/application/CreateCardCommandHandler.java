@@ -26,7 +26,7 @@ public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
 
         var card = new Card()
             .setBucketId(bucket.getId())
-            .setExternalId(command.getUuid())
+            .setExternalId(command.getExternalId())
             .setPosition(command.getPosition())
             .setName(command.getName());
 

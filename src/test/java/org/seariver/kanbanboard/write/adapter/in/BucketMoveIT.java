@@ -26,18 +26,18 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BucketMoveIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{uuid}/move";
+    public static final String ENDPOINT_PATH = "/v1/buckets/{id}/move";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
         // fixture
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-        var position = 1.23;
+        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var newPosition = 1.23;
 
         var template = String.format("{" +
             "  position : %s" +
-            "}", position);
+            "}", newPosition);
 
         var payload = new JsonTemplate(template).prettyString();
 
@@ -45,23 +45,23 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, existentExternalId)
             .then()
             .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(validUuid)).get();
-        assertThat(position).isEqualTo(actualBucket.getPosition());
+        var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
+        assertThat(newPosition).isEqualTo(actualBucket.getPosition());
     }
 
     @ParameterizedTest
-    @MethodSource("provideInvalidData")
+    @MethodSource("provideInvalidPositions")
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String errorMessage,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
-        String validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        String existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
 
         var payload = new JsonTemplate(jsonTemplate)
             .withValueProducer(new UuidStringValueProducer())
@@ -72,7 +72,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, existentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -87,7 +87,7 @@ class BucketMoveIT extends IntegrationHelper {
     void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
 
         // fixture
-        var notExistentUuid = "effce142-1a08-49d4-9fe6-3fe728b17a41";
+        var notExistentExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
 
         var template = "{" +
             "  position : @f" +
@@ -99,7 +99,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, notExistentUuid)
+            .when().put(ENDPOINT_PATH, notExistentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -111,15 +111,15 @@ class BucketMoveIT extends IntegrationHelper {
     }
 
     @Test
-    void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
+    void GIVEN_DuplicatedPosition_MUST_ReturnBadRequest() {
 
-        var validUuid = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-        var duplicatedPosition = 100.15;
+        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var alreadyInUsePosition = 100.15;
 
         // given
         var template = String.format("{" +
             "  position : %s" +
-            "}", duplicatedPosition);
+            "}", alreadyInUsePosition);
 
         var payload = new JsonTemplate(template).prettyString();
 
@@ -127,7 +127,7 @@ class BucketMoveIT extends IntegrationHelper {
         given()
             .contentType(ContentType.JSON)
             .body(payload).log().body()
-            .when().put(ENDPOINT_PATH, validUuid)
+            .when().put(ENDPOINT_PATH, existentExternalId)
             .then()
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
@@ -138,7 +138,7 @@ class BucketMoveIT extends IntegrationHelper {
             .log().body();
     }
 
-    private static Stream<Arguments> provideInvalidData() {
+    private static Stream<Arguments> provideInvalidPositions() {
 
         return Stream.of(
             arguments("{position:null}", "Invalid field",

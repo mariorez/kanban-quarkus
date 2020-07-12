@@ -23,21 +23,21 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
     void GIVEN_ValidCommand_MUST_UpdateBucketInDatabase() {
 
         // given
-        var uuid = UUID.fromString("6d9db741-ef57-4d5a-ac0f-34f68fb0ab5e");
+        var externalId = UUID.fromString("6d9db741-ef57-4d5a-ac0f-34f68fb0ab5e");
         var name = faker.pokemon().name();
-        var command = new UpdateBucketCommand(uuid, name);
+        var command = new UpdateBucketCommand(externalId, name);
         var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setExternalId(uuid).setPosition(123).setName("FOOBAR");
-        when(repository.findByExternalId(uuid)).thenReturn(Optional.of(bucket));
+        var bucket = new Bucket().setExternalId(externalId).setPosition(123).setName("FOOBAR");
+        when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
 
         // when
         var handler = new UpdateBucketCommandHandler(repository);
         handler.handle(command);
 
         // then
-        verify(repository).findByExternalId(uuid);
+        verify(repository).findByExternalId(externalId);
         verify(repository).update(bucket);
-        assertThat(bucket.getExternalId()).isEqualTo(uuid);
+        assertThat(bucket.getExternalId()).isEqualTo(externalId);
         assertThat(bucket.getName()).isEqualTo(name);
     }
 
@@ -45,17 +45,17 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
     void GIVEN_NotExistentBucket_MUST_ThrowException() {
 
         // given
-        var uuid = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
-        var command = new UpdateBucketCommand(uuid, "WHATEVER");
+        var notExistentExternalId = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
+        var command = new UpdateBucketCommand(notExistentExternalId, "WHATEVER");
         var repository = mock(WriteBucketRepository.class);
-        when(repository.findByExternalId(uuid)).thenReturn(Optional.empty());
+        when(repository.findByExternalId(notExistentExternalId)).thenReturn(Optional.empty());
 
         // when
         var handler = new UpdateBucketCommandHandler(repository);
         var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
 
         // then
-        verify(repository).findByExternalId(uuid);
+        verify(repository).findByExternalId(notExistentExternalId);
         assertThat(exception.getMessage()).isEqualTo("Bucket not exist");
     }
 }

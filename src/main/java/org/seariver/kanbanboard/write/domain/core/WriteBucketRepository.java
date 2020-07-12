@@ -10,7 +10,7 @@ public interface WriteBucketRepository {
 
     void update(Bucket bucket);
 
-    Optional<Bucket> findByExternalId(UUID uuid);
+    Optional<Bucket> findByExternalId(UUID externalId);
 
-    List<Bucket> findByExternalIdOrPosition(UUID uuid, double position);
+    List<Bucket> findByExternalIdOrPosition(UUID externalId, double position);
 }

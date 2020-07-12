@@ -4,20 +4,20 @@ import java.util.UUID;
 
 public class CreateCardCommand implements Command {
 
-    private final UUID uuid;
+    private final UUID externalId;
     private final UUID bucketId;
     private final double position;
     private final String name;
 
-    public CreateCardCommand(UUID uuid, UUID bucketId, double position, String name) {
-        this.uuid = uuid;
+    public CreateCardCommand(UUID externalId, UUID bucketId, double position, String name) {
+        this.externalId = externalId;
         this.bucketId = bucketId;
         this.position = position;
         this.name = name;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public UUID getBucketId() {

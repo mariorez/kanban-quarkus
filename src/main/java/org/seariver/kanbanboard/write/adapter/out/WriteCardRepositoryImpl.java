@@ -40,12 +40,12 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     }
 
     @Override
-    public Optional<Card> findByUuid(UUID uuid) {
+    public Optional<Card> findByUuid(UUID externalId) {
 
         var sql = "SELECT bucket_id, external_id, position, name, created_at, updated_at FROM card WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(EXTERNAL_ID, uuid);
+            .addValue(EXTERNAL_ID, externalId);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 

@@ -4,18 +4,18 @@ import java.util.UUID;
 
 public class CreateBucketCommand implements Command {
 
-    private final UUID uuid;
+    private final UUID externalId;
     private final double position;
     private final String name;
 
-    public CreateBucketCommand(UUID uuid, double position, String name) {
-        this.uuid = uuid;
+    public CreateBucketCommand(UUID externalId, double position, String name) {
+        this.externalId = externalId;
         this.position = position;
         this.name = name;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public double getPosition() {

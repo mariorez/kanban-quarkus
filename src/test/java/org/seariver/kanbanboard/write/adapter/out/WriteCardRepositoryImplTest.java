@@ -33,12 +33,12 @@ class WriteCardRepositoryImplTest extends TestHelper {
 
         // given
         var bucketId = 1L;
-        var uuid = UUID.randomUUID();
+        var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
         var expected = new Card()
             .setBucketId(bucketId)
-            .setExternalId(uuid)
+            .setExternalId(externalId)
             .setPosition(position)
             .setName(name);
 
@@ -46,7 +46,7 @@ class WriteCardRepositoryImplTest extends TestHelper {
         repository.create(expected);
 
         // then
-        var actualOptional = repository.findByUuid(uuid);
+        var actualOptional = repository.findByUuid(externalId);
         Card actual = actualOptional.get();
         assertThat(actual.getBucketId()).isEqualTo(bucketId);
         assertThat(actual.getExternalId()).isEqualTo(expected.getExternalId());

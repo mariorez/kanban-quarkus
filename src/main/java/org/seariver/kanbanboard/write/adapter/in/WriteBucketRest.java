@@ -1,6 +1,7 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -37,7 +38,7 @@ import java.util.UUID;
 public class WriteBucketRest {
 
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
-    public static final String INVALID_UUID = "invalid uuid format";
+    public static final String INVALID_UUID = "invalid UUID format";
     @Inject
     private CreateBucketCommandHandler createHandler;
     @Inject
@@ -51,41 +52,41 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(@Valid CreateInput input) {
 
-        var command = new CreateBucketCommand(UUID.fromString(input.uuid), input.position, input.name);
+        var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
         createHandler.handle(command);
 
-        return Response.created(URI.create(String.format("v1/buckets/%s", input.uuid))).build();
+        return Response.created(URI.create(String.format("v1/buckets/%s", input.externalId))).build();
     }
 
     @PUT
-    @Path("{uuid}")
+    @Path("{id}")
     @APIResponse(responseCode = "201", description = "Bucket update successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response update(
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        @PathParam("uuid") String uuid,
+        @PathParam("id") String externalId,
         @Valid UpdateInput input) {
 
-        var command = new UpdateBucketCommand(UUID.fromString(uuid), input.name);
+        var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
         updateHandler.handle(command);
 
         return Response.noContent().build();
     }
 
     @PUT
-    @Path("{uuid}/move")
+    @Path("{id}/move")
     @APIResponse(responseCode = "201", description = "Bucket moved successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response move(
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        @PathParam("uuid") String uuid,
+        @PathParam("id") String externalId,
         @Valid MoveInput input) {
 
-        var command = new MoveBucketCommand(UUID.fromString(uuid), input.position);
+        var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
         moveHandler.handle(command);
 
         return Response.noContent().build();
@@ -95,7 +96,8 @@ public class WriteBucketRest {
     static class CreateInput {
         @NotBlank
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        public String uuid;
+        @JsonProperty("id")
+        public String externalId;
         @Positive
         public double position;
         @NotBlank

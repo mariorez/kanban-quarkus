@@ -4,16 +4,16 @@ import java.util.UUID;
 
 public class UpdateBucketCommand implements Command {
 
-    private final UUID uuid;
+    private final UUID externalId;
     private final String name;
 
-    public UpdateBucketCommand(UUID uuid, String name) {
-        this.uuid = uuid;
+    public UpdateBucketCommand(UUID externalId, String name) {
+        this.externalId = externalId;
         this.name = name;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public String getName() {

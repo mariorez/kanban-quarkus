@@ -63,12 +63,12 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("creatingWithDuplicatedDataProvider")
-    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID uuid,
+    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID externalId,
                                                                           double position,
                                                                           Map<String, Object> expectedError) {
         // given
         var expected = new Bucket()
-            .setExternalId(uuid)
+            .setExternalId(externalId)
             .setPosition(position)
             .setName("WHATEVER");
 
@@ -84,8 +84,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     @Test
     void WHEN_UpdatingBucket_WITH_ValidData_MUST_SaveOnDatabase() {
         // given
-        var uuid = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
-        var actualBucket = repository.findByExternalId(uuid).get();
+        var externalId = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
+        var actualBucket = repository.findByExternalId(externalId).get();
         assertThat(actualBucket.getPosition()).isEqualTo(200.987);
         assertThat(actualBucket.getName()).isEqualTo("SECOND-BUCKET");
 
@@ -97,8 +97,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.update(actualBucket);
 
         // then
-        var expectedBucket = repository.findByExternalId(uuid).get();
-        assertThat(expectedBucket.getExternalId()).isEqualTo(uuid);
+        var expectedBucket = repository.findByExternalId(externalId).get();
+        assertThat(expectedBucket.getExternalId()).isEqualTo(externalId);
         assertThat(expectedBucket.getPosition()).isEqualTo(position);
         assertThat(expectedBucket.getName()).isEqualTo(name);
         assertThat(expectedBucket.getCreatedAt()).isNotNull();
