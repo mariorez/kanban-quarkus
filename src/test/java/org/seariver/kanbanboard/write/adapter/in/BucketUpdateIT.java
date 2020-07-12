@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -76,7 +77,7 @@ class BucketUpdateIT extends IntegrationHelper {
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is("Invalid parameter"))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails))
             .log().body();
@@ -100,10 +101,10 @@ class BucketUpdateIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().put(ENDPOINT_PATH, notExistentExternalId)
             .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
+            .statusCode(NOT_FOUND.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is(NOT_FOUND.getReasonPhrase()))
             .and().body("errors.field", containsInAnyOrder("code"))
             .and().body("errors.detail", containsInAnyOrder("1001"))
             .log().body();

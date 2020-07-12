@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -84,7 +85,7 @@ class BucketMoveIT extends IntegrationHelper {
     }
 
     @Test
-    void GIVEN_NotExistentKey_MUST_ReturnBadRequest() {
+    void GIVEN_NotExistentExternalId_MUST_ReturnBadRequest() {
 
         // fixture
         var notExistentExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
@@ -101,10 +102,10 @@ class BucketMoveIT extends IntegrationHelper {
             .body(payload).log().body()
             .when().put(ENDPOINT_PATH, notExistentExternalId)
             .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
+            .statusCode(NOT_FOUND.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is(NOT_FOUND.getReasonPhrase()))
             .and().body("errors.field", containsInAnyOrder("code"))
             .and().body("errors.detail", containsInAnyOrder("1001"))
             .log().body();
@@ -132,7 +133,7 @@ class BucketMoveIT extends IntegrationHelper {
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is("Invalid parameter"))
             .and().body("errors.field", containsInAnyOrder("code"))
             .and().body("errors.detail", containsInAnyOrder("1000"))
             .log().body();
@@ -141,15 +142,15 @@ class BucketMoveIT extends IntegrationHelper {
     private static Stream<Arguments> provideInvalidPositions() {
 
         return Stream.of(
-            arguments("{position:null}", "Invalid field",
+            arguments("{position:null}", "Invalid parameter",
                 args("position"), args("must be greater than 0")),
             arguments("{position:@s}", "Invalid format",
                 args("position"), args("double")),
-            arguments("{position:0}", "Invalid field",
+            arguments("{position:0}", "Invalid parameter",
                 args("position"), args("must be greater than 0")),
-            arguments("{position:-1}", "Invalid field",
+            arguments("{position:-1}", "Invalid parameter",
                 args("position"), args("must be greater than 0")),
-            arguments("{notExistent:@f}", "Invalid field",
+            arguments("{notExistent:@f}", "Invalid parameter",
                 args("position"), args("must be greater than 0"))
         );
     }

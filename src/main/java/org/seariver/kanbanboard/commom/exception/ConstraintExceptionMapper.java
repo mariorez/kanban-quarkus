@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Provider
 public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
-    public static final String INVALID_FIELD_MESSAGE = "Invalid field";
+    public static final String INVALID_PARAMETER_MESSAGE = "Invalid parameter";
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
@@ -22,11 +22,12 @@ public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViol
             .map(error -> {
                 var fieldPath = error.getPropertyPath().toString();
                 var fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
+                fieldName = "externalId".equals(fieldName) ? "id" : fieldName;
                 return new ErrorField(fieldName, error.getMessage());
             })
             .collect(Collectors.toList());
 
-        var errorResult = new ResponseError(INVALID_FIELD_MESSAGE, errors);
+        var errorResult = new ResponseError(INVALID_PARAMETER_MESSAGE, errors);
 
         return Response
             .status(Response.Status.BAD_REQUEST)

@@ -73,7 +73,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is("Invalid parameter"))
             .and().body("errors.field", containsInAnyOrder(errorsFields))
             .and().body("errors.detail", containsInAnyOrder(errorsDetails))
             .log().body();
@@ -124,7 +124,7 @@ class BuckeCreationtIT extends IntegrationHelper {
             .statusCode(BAD_REQUEST.getStatusCode())
             .contentType(ContentType.JSON)
             .assertThat()
-            .body("message", is("Invalid field"))
+            .body("message", is("Invalid parameter"))
             .and().body("errors.field", containsInAnyOrder("code"))
             .and().body("errors.detail", containsInAnyOrder("1000"))
             .log().body();
@@ -135,16 +135,16 @@ class BuckeCreationtIT extends IntegrationHelper {
         return Stream.of(
             arguments(
                 "{id:null, position:@f, name:@s}",
-                args("externalId"), args("must not be blank")),
+                args("id"), args("must not be blank")),
             arguments(
                 "{id:@s(length=0), position:@f, name:@s}",
-                args("externalId", "externalId"), args("must not be blank", "invalid UUID format")),
+                args("id", "id"), args("must not be blank", "invalid UUID format")),
             arguments(
                 "{id:@s(foobar), position:@f, name:@s}",
-                args("externalId"), args("invalid UUID format")),
+                args("id"), args("invalid UUID format")),
             arguments(
                 "{notExistentField:@s, position:@f, name:@s}",
-                args("externalId"), args("must not be blank")),
+                args("id"), args("must not be blank")),
             arguments(
                 "{id:@uuid, position:@f(-1), name:@s}",
                 args("position"), args("must be greater than 0")),
