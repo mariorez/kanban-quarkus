@@ -15,7 +15,7 @@ import org.seariver.kanbanboard.write.domain.application.MoveBucketCommandHandle
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
 
-import javax.inject.Inject;
+import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.UUID;
 
+@ApplicationScoped
 @Path("v1/buckets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -39,12 +40,18 @@ public class WriteBucketRest {
 
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
-    @Inject
+
     private CreateBucketCommandHandler createHandler;
-    @Inject
     private UpdateBucketCommandHandler updateHandler;
-    @Inject
     private MoveBucketCommandHandler moveHandler;
+
+    public WriteBucketRest(CreateBucketCommandHandler createHandler,
+                           UpdateBucketCommandHandler updateHandler,
+                           MoveBucketCommandHandler moveHandler) {
+        this.createHandler = createHandler;
+        this.updateHandler = updateHandler;
+        this.moveHandler = moveHandler;
+    }
 
     @POST
     @APIResponse(responseCode = "201", description = "Bucket created successful")
