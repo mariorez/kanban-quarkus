@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-class BuckeCreationtIT extends IntegrationHelper {
+class BuckCreationIT extends IntegrationHelper {
 
     public static final String ENDPOINT_PATH = "/v1/buckets";
 
