@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.seariver.kanbanboard.write.adapter.out.WriteBucketRepositoryImpl;
 
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -32,15 +34,18 @@ class BuckCreationIT extends IntegrationHelper {
 
         // fixture
         var externalId = UUID.randomUUID().toString();
+        var position = faker.number().randomDouble(3, 1, 10);
+        var name = faker.pokemon().name();
 
-        var template = "{" +
+        var template = String.format("{" +
             "  id : $id," +
-            "  position : @f," +
-            "  name : @s" +
-            "}";
+            "  position : %s," +
+            "  name : $name" +
+            "}", position);
 
         var payload = new JsonTemplate(template)
             .withVar("id", externalId)
+            .withVar("name", name)
             .prettyString();
 
         // verify
@@ -50,8 +55,12 @@ class BuckCreationIT extends IntegrationHelper {
             .when()
             .post(ENDPOINT_PATH)
             .then()
-            .statusCode(CREATED.getStatusCode())
-            .header("Location", containsString(String.format("/v1/buckets/%s", externalId)));
+            .statusCode(CREATED.getStatusCode());
+
+        var repository = new WriteBucketRepositoryImpl(dataSource);
+        var newBucket = repository.findByExternalId(UUID.fromString(externalId)).get();
+        assertThat(newBucket.getName()).isEqualTo(name);
+        assertThat(newBucket.getPosition()).isEqualTo(position);
     }
 
     @ParameterizedTest

@@ -55,7 +55,7 @@ class BucketUpdateIT extends IntegrationHelper {
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
-        assertThat(newName).isEqualTo(actualBucket.getName());
+        assertThat(actualBucket.getName()).isEqualTo(newName);
     }
 
     @ParameterizedTest

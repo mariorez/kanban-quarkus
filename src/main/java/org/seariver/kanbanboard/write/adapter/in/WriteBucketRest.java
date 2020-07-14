@@ -28,8 +28,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.UUID;
+
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 @ApplicationScoped
 @Path("v1/buckets")
@@ -62,7 +63,7 @@ public class WriteBucketRest {
         var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
         createHandler.handle(command);
 
-        return Response.created(URI.create(String.format("v1/buckets/%s", input.externalId))).build();
+        return Response.status(CREATED).build();
     }
 
     @PUT

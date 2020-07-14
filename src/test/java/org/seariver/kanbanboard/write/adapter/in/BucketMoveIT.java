@@ -53,7 +53,7 @@ class BucketMoveIT extends IntegrationHelper {
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
-        assertThat(newPosition).isEqualTo(actualBucket.getPosition());
+        assertThat(actualBucket.getPosition()).isEqualTo(newPosition);
     }
 
     @ParameterizedTest
