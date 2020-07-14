@@ -8,11 +8,13 @@ import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.Card;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
+import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,5 +51,24 @@ public class CreateCardCommandHandlerTest extends TestHelper {
         assertThat(card.getExternalId()).isEqualTo(externalId);
         assertThat(card.getPosition()).isEqualTo(position);
         assertThat(card.getName()).isEqualTo(name);
+    }
+
+    @Test
+    void GIVEN_NotExistentBucket_MUST_ThrowException() {
+
+        // given
+        var notExistentBucketExternalId = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
+        var command = new CreateCardCommand(notExistentBucketExternalId, UUID.randomUUID(), 1.3, "WHATEVER");
+        var bucketRepository = mock(WriteBucketRepository.class);
+        var cardRepository = mock(WriteCardRepository.class);
+        when(bucketRepository.findByExternalId(notExistentBucketExternalId)).thenReturn(Optional.empty());
+
+        // when
+        var handler = new CreateCardCommandHandler(bucketRepository, cardRepository);
+        var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
+
+        // then
+        verify(bucketRepository).findByExternalId(notExistentBucketExternalId);
+        assertThat(exception.getMessage()).isEqualTo("Bucket not exist");
     }
 }

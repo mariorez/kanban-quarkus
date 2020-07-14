@@ -4,9 +4,12 @@ import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.Card;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
+import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
 
 import javax.inject.Singleton;
 import java.util.Optional;
+
+import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
 
 @Singleton
 public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
@@ -22,6 +25,11 @@ public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
     public void handle(CreateCardCommand command) {
 
         Optional<Bucket> bucketOptional = bucketRepository.findByExternalId(command.getBucketExternalId());
+
+        if (bucketOptional.isEmpty()) {
+            throw new BucketNotExistentException(BUCKET_NOT_EXIST);
+        }
+
         var bucket = bucketOptional.get();
 
         var card = new Card()
