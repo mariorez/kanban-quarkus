@@ -4,24 +4,24 @@ import java.util.UUID;
 
 public class CreateCardCommand implements Command {
 
+    private final UUID bucketExternalId;
     private final UUID externalId;
-    private final UUID bucketId;
     private final double position;
     private final String name;
 
-    public CreateCardCommand(UUID externalId, UUID bucketId, double position, String name) {
+    public CreateCardCommand(UUID bucketExternalId, UUID externalId, double position, String name) {
+        this.bucketExternalId = bucketExternalId;
         this.externalId = externalId;
-        this.bucketId = bucketId;
         this.position = position;
         this.name = name;
     }
 
-    public UUID getExternalId() {
-        return externalId;
+    public UUID getBucketExternalId() {
+        return bucketExternalId;
     }
 
-    public UUID getBucketId() {
-        return bucketId;
+    public UUID getExternalId() {
+        return externalId;
     }
 
     public double getPosition() {

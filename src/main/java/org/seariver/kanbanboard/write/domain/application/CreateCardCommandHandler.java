@@ -21,7 +21,7 @@ public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
 
     public void handle(CreateCardCommand command) {
 
-        Optional<Bucket> bucketOptional = bucketRepository.findByExternalId(command.getBucketId());
+        Optional<Bucket> bucketOptional = bucketRepository.findByExternalId(command.getBucketExternalId());
         var bucket = bucketOptional.get();
 
         var card = new Card()

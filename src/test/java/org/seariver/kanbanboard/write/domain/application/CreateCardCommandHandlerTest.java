@@ -27,11 +27,11 @@ public class CreateCardCommandHandlerTest extends TestHelper {
 
         // given
         var bucketId = 100L;
-        var externalId = UUID.randomUUID();
         var bucketExternalId = UUID.randomUUID();
+        var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
-        CreateCardCommand command = new CreateCardCommand(externalId, bucketExternalId, position, name);
+        CreateCardCommand command = new CreateCardCommand(bucketExternalId, externalId, position, name);
         var bucketRepository = mock(WriteBucketRepository.class);
         var cardRepository = mock(WriteCardRepository.class);
         when(bucketRepository.findByExternalId(bucketExternalId)).thenReturn(
