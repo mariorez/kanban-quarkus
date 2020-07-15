@@ -58,7 +58,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "201", description = "Bucket created successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response create(@Valid CreateInput input) {
+    public Response create(@Valid CreateBucketInput input) {
 
         var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
         createHandler.handle(command);
@@ -75,7 +75,7 @@ public class WriteBucketRest {
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @PathParam("id") String externalId,
-        @Valid UpdateInput input) {
+        @Valid UpdateBucketInput input) {
 
         var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
         updateHandler.handle(command);
@@ -92,7 +92,7 @@ public class WriteBucketRest {
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @PathParam("id") String externalId,
-        @Valid MoveInput input) {
+        @Valid MoveBucketInput input) {
 
         var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
         moveHandler.handle(command);
@@ -101,7 +101,7 @@ public class WriteBucketRest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class CreateInput {
+    static class CreateBucketInput {
         @NotBlank
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @JsonProperty("id")
@@ -114,14 +114,14 @@ public class WriteBucketRest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class UpdateInput {
+    static class UpdateBucketInput {
         @NotBlank
         @Size(min = 1, max = 100)
         public String name;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MoveInput {
+    static class MoveBucketInput {
         @Positive
         public double position;
     }

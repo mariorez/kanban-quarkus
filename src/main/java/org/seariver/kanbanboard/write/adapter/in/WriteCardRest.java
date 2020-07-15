@@ -52,7 +52,7 @@ public class WriteCardRest {
         @Valid
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @PathParam("bucketId") String bucketExternalId,
-        @Valid CreateInput input) {
+        @Valid CreateCardInput input) {
 
         var command = new CreateCardCommand(UUID.fromString(bucketExternalId),
             UUID.fromString(input.externalId),
@@ -65,7 +65,7 @@ public class WriteCardRest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class CreateInput {
+    static class CreateCardInput {
         @NotBlank
         @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
         @JsonProperty("id")
