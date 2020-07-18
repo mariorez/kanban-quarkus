@@ -2,7 +2,8 @@ version: '3.7'
 
 services:
 
-  postgres_kanban_quarkus:
+  postgres:
+    container_name: postgres_kanbanboard
     image: postgres:12
     restart: always
     ports:
