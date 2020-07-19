@@ -3,9 +3,9 @@ package org.seariver.kanbanboard.write.domain.application;
 import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 
-@Singleton
+@ApplicationScoped
 public class CreateBucketCommandHandler implements Handler<CreateBucketCommand> {
 
     private final WriteBucketRepository repository;
@@ -17,9 +17,9 @@ public class CreateBucketCommandHandler implements Handler<CreateBucketCommand> 
     public void handle(CreateBucketCommand command) {
 
         var bucket = new Bucket()
-            .setExternalId(command.getExternalId())
-            .setPosition(command.getPosition())
-            .setName(command.getName());
+                .setExternalId(command.getExternalId())
+                .setPosition(command.getPosition())
+                .setName(command.getName());
 
         repository.create(bucket);
     }

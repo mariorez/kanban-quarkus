@@ -7,7 +7,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import javax.inject.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.INVALID_DUPLICATED_DATA;
 
-@Singleton
+@ApplicationScoped
 public class WriteCardRepositoryImpl implements WriteCardRepository {
 
     public static final String BUCKET_ID_FIELD = "bucket_id";
@@ -35,13 +35,13 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     public void create(Card card) {
         try {
             var sql = "INSERT INTO card (bucket_id, external_id, position, name) " +
-                "values (:bucket_id, :external_id, :position, :name)";
+                    "values (:bucket_id, :external_id, :position, :name)";
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(BUCKET_ID_FIELD, card.getBucketId())
-                .addValue(EXTERNAL_ID, card.getExternalId())
-                .addValue(POSITION_FIELD, card.getPosition())
-                .addValue(NAME_FIELD, card.getName());
+                    .addValue(BUCKET_ID_FIELD, card.getBucketId())
+                    .addValue(EXTERNAL_ID, card.getExternalId())
+                    .addValue(POSITION_FIELD, card.getPosition())
+                    .addValue(NAME_FIELD, card.getName());
 
             jdbcTemplate.update(sql, parameters);
 
@@ -71,18 +71,18 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
         var sql = "SELECT bucket_id, external_id, position, name, created_at, updated_at FROM card WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(EXTERNAL_ID, externalId);
+                .addValue(EXTERNAL_ID, externalId);
 
         return jdbcTemplate.query(sql, parameters, resultSet -> {
 
             if (resultSet.next()) {
                 return Optional.of(new Card()
-                    .setBucketId(resultSet.getLong(BUCKET_ID_FIELD))
-                    .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
-                    .setPosition(resultSet.getDouble(POSITION_FIELD))
-                    .setName(resultSet.getString(NAME_FIELD))
-                    .setCreatedAt(resultSet.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
-                    .setUpdatedAt(resultSet.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
+                        .setBucketId(resultSet.getLong(BUCKET_ID_FIELD))
+                        .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
+                        .setPosition(resultSet.getDouble(POSITION_FIELD))
+                        .setName(resultSet.getString(NAME_FIELD))
+                        .setCreatedAt(resultSet.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
+                        .setUpdatedAt(resultSet.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
                 );
             }
 
@@ -93,20 +93,20 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     private List<Card> findByExternalIdOrPosition(UUID externalId, double position) {
 
         var sql = "SELECT bucket_id, external_id, position, name, created_at, updated_at " +
-            "FROM card WHERE external_id = :external_id OR position = :position";
+                "FROM card WHERE external_id = :external_id OR position = :position";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-            .addValue(EXTERNAL_ID, externalId)
-            .addValue(POSITION_FIELD, position);
+                .addValue(EXTERNAL_ID, externalId)
+                .addValue(POSITION_FIELD, position);
 
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
-            new Card()
-                .setBucketId(rs.getLong(BUCKET_ID_FIELD))
-                .setExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
-                .setPosition(rs.getDouble(POSITION_FIELD))
-                .setName(rs.getString(NAME_FIELD))
-                .setCreatedAt(rs.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
-                .setUpdatedAt(rs.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
+                new Card()
+                        .setBucketId(rs.getLong(BUCKET_ID_FIELD))
+                        .setExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
+                        .setPosition(rs.getDouble(POSITION_FIELD))
+                        .setName(rs.getString(NAME_FIELD))
+                        .setCreatedAt(rs.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
+                        .setUpdatedAt(rs.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
         );
     }
 }
