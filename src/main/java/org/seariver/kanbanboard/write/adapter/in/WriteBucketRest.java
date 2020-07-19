@@ -6,6 +6,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
@@ -39,6 +40,8 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 @Tag(name = "bucket")
 public class WriteBucketRest {
 
+    final static Logger logger = Logger.getLogger(WriteBucketRest.class);
+
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
@@ -59,6 +62,8 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(@Valid CreateBucketInput input) {
+
+        logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.externalId);
 
         var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
         createHandler.handle(command);

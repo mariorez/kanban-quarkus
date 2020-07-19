@@ -35,3 +35,37 @@ services:
     container_name: grafana_kanbanboard
     image: grafana/grafana:7.1.0
     network_mode: "host"
+
+  # se ocorrer [1]: max virtual memory areas vm.max_map_count [65530] is too low,
+  # increase to at least [262144]
+  # sudo sysctl -w vm.max_map_count=262144
+  elastic:
+    container_name: elasticsearch_kanbanboard
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    network_mode: "host"
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    container_name: kibana_kanbanboard
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    network_mode: "host"
+    environment:
+      ELASTICSEARCH_HOSTS: http://localhost:9200
+
+  logstash:
+    container_name: logstash_kanbanboard
+    image: docker.elastic.co/logstash/logstash-oss:7.8.0
+    volumes:
+      - ./pipelines:/usr/share/logstash/pipeline
+    network_mode: "host"
+    depends_on:
+      - elastic
