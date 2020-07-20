@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
-class UpdateBucketCommandHandlerTest extends TestHelper {
+class UpdateBucketHandlerTest extends TestHelper {
 
     @Test
     void GIVEN_ValidCommand_MUST_UpdateBucketInDatabase() {
@@ -31,7 +31,7 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
         when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
 
         // when
-        var handler = new UpdateBucketCommandHandler(repository);
+        var handler = new UpdateBucketHandler(repository);
         handler.handle(command);
 
         // then
@@ -51,7 +51,7 @@ class UpdateBucketCommandHandlerTest extends TestHelper {
         when(repository.findByExternalId(notExistentExternalId)).thenReturn(Optional.empty());
 
         // when
-        var handler = new UpdateBucketCommandHandler(repository);
+        var handler = new UpdateBucketHandler(repository);
         var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
 
         // then

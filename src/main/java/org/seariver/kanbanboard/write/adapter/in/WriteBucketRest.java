@@ -10,11 +10,11 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.CreateBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.CreateBucketHandler;
 import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.MoveBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.MoveBucketHandler;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommandHandler;
+import org.seariver.kanbanboard.write.domain.application.UpdateBucketHandler;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
@@ -45,13 +45,13 @@ public class WriteBucketRest {
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
-    private CreateBucketCommandHandler createHandler;
-    private UpdateBucketCommandHandler updateHandler;
-    private MoveBucketCommandHandler moveHandler;
+    private CreateBucketHandler createHandler;
+    private UpdateBucketHandler updateHandler;
+    private MoveBucketHandler moveHandler;
 
-    public WriteBucketRest(CreateBucketCommandHandler createHandler,
-                           UpdateBucketCommandHandler updateHandler,
-                           MoveBucketCommandHandler moveHandler) {
+    public WriteBucketRest(CreateBucketHandler createHandler,
+                           UpdateBucketHandler updateHandler,
+                           MoveBucketHandler moveHandler) {
         this.createHandler = createHandler;
         this.updateHandler = updateHandler;
         this.moveHandler = moveHandler;

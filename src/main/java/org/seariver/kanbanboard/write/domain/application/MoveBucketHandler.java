@@ -8,11 +8,11 @@ import javax.enterprise.context.ApplicationScoped;
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
 
 @ApplicationScoped
-public class MoveBucketCommandHandler {
+public class MoveBucketHandler {
 
     private final WriteBucketRepository repository;
 
-    public MoveBucketCommandHandler(WriteBucketRepository repository) {
+    public MoveBucketHandler(WriteBucketRepository repository) {
         this.repository = repository;
     }
 

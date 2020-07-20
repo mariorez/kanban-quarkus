@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
-public class CreateCardCommandHandlerTest extends TestHelper {
+public class CreateCardHandlerTest extends TestHelper {
 
     private ArgumentCaptor<Card> captor = ArgumentCaptor.forClass(Card.class);
 
@@ -40,7 +40,7 @@ public class CreateCardCommandHandlerTest extends TestHelper {
             Optional.of(new Bucket().setId(bucketId).setExternalId(bucketExternalId)));
 
         // when
-        CreateCardCommandHandler handler = new CreateCardCommandHandler(bucketRepository, cardRepository);
+        CreateCardHandler handler = new CreateCardHandler(bucketRepository, cardRepository);
         handler.handle(command);
 
         // then
@@ -64,7 +64,7 @@ public class CreateCardCommandHandlerTest extends TestHelper {
         when(bucketRepository.findByExternalId(notExistentBucketExternalId)).thenReturn(Optional.empty());
 
         // when
-        var handler = new CreateCardCommandHandler(bucketRepository, cardRepository);
+        var handler = new CreateCardHandler(bucketRepository, cardRepository);
         var exception = assertThrows(BucketNotExistentException.class, () -> handler.handle(command));
 
         // then

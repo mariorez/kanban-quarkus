@@ -12,12 +12,12 @@ import java.util.Optional;
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
 
 @ApplicationScoped
-public class CreateCardCommandHandler implements Handler<CreateCardCommand> {
+public class CreateCardHandler implements Handler<CreateCardCommand> {
 
     private WriteBucketRepository bucketRepository;
     private WriteCardRepository cardRepository;
 
-    public CreateCardCommandHandler(WriteBucketRepository bucketRepository, WriteCardRepository cardRepository) {
+    public CreateCardHandler(WriteBucketRepository bucketRepository, WriteCardRepository cardRepository) {
         this.bucketRepository = bucketRepository;
         this.cardRepository = cardRepository;
     }

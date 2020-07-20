@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("unit")
-public class MoveBucketCommandHandlerTest extends TestHelper {
+public class MoveBucketHandlerTest extends TestHelper {
 
     @Test
     void GIVEN_ValidPosition_MUST_UpdateBucketPosition() {
@@ -31,7 +31,7 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
         when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
 
         // when
-        var handler = new MoveBucketCommandHandler(repository);
+        var handler = new MoveBucketHandler(repository);
         handler.handle(command);
 
         // then
@@ -52,7 +52,7 @@ public class MoveBucketCommandHandlerTest extends TestHelper {
         when(repository.findByExternalId(externalId)).thenReturn(Optional.empty());
 
         // when
-        var handler = new MoveBucketCommandHandler(repository);
+        var handler = new MoveBucketHandler(repository);
         var exception = assertThrows(
             BucketNotExistentException.class, () -> handler.handle(command));
 
