@@ -4,7 +4,9 @@ import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
+@Named
 @ApplicationScoped
 public class CreateBucketHandler implements Handler<CreateBucketCommand> {
 

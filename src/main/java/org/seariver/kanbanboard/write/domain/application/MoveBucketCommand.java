@@ -2,7 +2,7 @@ package org.seariver.kanbanboard.write.domain.application;
 
 import java.util.UUID;
 
-public class MoveBucketCommand {
+public class MoveBucketCommand implements Command {
 
     private final UUID externalId;
     private final double position;

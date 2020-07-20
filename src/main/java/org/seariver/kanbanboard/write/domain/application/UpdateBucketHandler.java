@@ -5,10 +5,12 @@ import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import java.util.Optional;
 
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
 
+@Named
 @ApplicationScoped
 public class UpdateBucketHandler implements Handler<UpdateBucketCommand> {
 

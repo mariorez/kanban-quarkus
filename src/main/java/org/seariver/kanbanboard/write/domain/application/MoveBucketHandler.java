@@ -4,11 +4,13 @@ import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
 import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
 
+@Named
 @ApplicationScoped
-public class MoveBucketHandler {
+public class MoveBucketHandler implements Handler<MoveBucketCommand> {
 
     private final WriteBucketRepository repository;
 

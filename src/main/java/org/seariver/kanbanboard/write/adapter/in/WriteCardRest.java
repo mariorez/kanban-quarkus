@@ -8,8 +8,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
+import org.seariver.kanbanboard.write.CommandBus;
 import org.seariver.kanbanboard.write.domain.application.CreateCardCommand;
-import org.seariver.kanbanboard.write.domain.application.CreateCardHandler;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
@@ -37,10 +37,10 @@ public class WriteCardRest {
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
-    private CreateCardHandler createCardHandler;
+    private CommandBus commandBus;
 
-    public WriteCardRest(CreateCardHandler createCardHandler) {
-        this.createCardHandler = createCardHandler;
+    public WriteCardRest(CommandBus commandBus) {
+        this.commandBus = commandBus;
     }
 
     @POST
@@ -49,17 +49,17 @@ public class WriteCardRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(
-        @Valid
-        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        @PathParam("bucketId") String bucketExternalId,
-        @Valid CreateCardInput input) {
+            @Valid
+            @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+            @PathParam("bucketId") String bucketExternalId,
+            @Valid CreateCardInput input) {
 
         var command = new CreateCardCommand(UUID.fromString(bucketExternalId),
-            UUID.fromString(input.externalId),
-            input.position,
-            input.name);
+                UUID.fromString(input.externalId),
+                input.position,
+                input.name);
 
-        createCardHandler.handle(command);
+        commandBus.execute(command);
 
         return Response.status(CREATED).build();
     }

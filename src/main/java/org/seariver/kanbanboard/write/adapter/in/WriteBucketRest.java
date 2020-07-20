@@ -9,12 +9,10 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
+import org.seariver.kanbanboard.write.CommandBus;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.CreateBucketHandler;
 import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.MoveBucketHandler;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.UpdateBucketHandler;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
@@ -45,16 +43,10 @@ public class WriteBucketRest {
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
-    private CreateBucketHandler createHandler;
-    private UpdateBucketHandler updateHandler;
-    private MoveBucketHandler moveHandler;
+    private CommandBus commandBus;
 
-    public WriteBucketRest(CreateBucketHandler createHandler,
-                           UpdateBucketHandler updateHandler,
-                           MoveBucketHandler moveHandler) {
-        this.createHandler = createHandler;
-        this.updateHandler = updateHandler;
-        this.moveHandler = moveHandler;
+    public WriteBucketRest(CommandBus commandBus) {
+        this.commandBus = commandBus;
     }
 
     @POST
@@ -66,7 +58,7 @@ public class WriteBucketRest {
         logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.externalId);
 
         var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
-        createHandler.handle(command);
+        commandBus.execute(command);
 
         return Response.status(CREATED).build();
     }
@@ -77,13 +69,13 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response update(
-        @Valid
-        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        @PathParam("id") String externalId,
-        @Valid UpdateBucketInput input) {
+            @Valid
+            @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+            @PathParam("id") String externalId,
+            @Valid UpdateBucketInput input) {
 
         var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
-        updateHandler.handle(command);
+        commandBus.execute(command);
 
         return Response.noContent().build();
     }
@@ -94,13 +86,13 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response move(
-        @Valid
-        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-        @PathParam("id") String externalId,
-        @Valid MoveBucketInput input) {
+            @Valid
+            @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+            @PathParam("id") String externalId,
+            @Valid MoveBucketInput input) {
 
         var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
-        moveHandler.handle(command);
+        commandBus.execute(command);
 
         return Response.noContent().build();
     }
