@@ -11,16 +11,20 @@ import java.util.Map;
 public class CommandEvent {
 
     private final Command command;
+    private Exception exception;
     private long startTime;
     private long stopTime;
-    private Exception exception;
 
     public CommandEvent(Command command) {
         startTimer();
         this.command = command;
     }
 
-    public String getSource() {
+    public Command getCommand() {
+        return command;
+    }
+
+    public String getOrigin() {
         return command.getClass().getSimpleName();
     }
 
@@ -59,7 +63,8 @@ public class CommandEvent {
     public String toJson() {
 
         var mapper = new ObjectMapper();
-        Map<String, Object> message = new HashMap<>(Map.of("event", command.toString()));
+        Map<String, Object> message = new HashMap<>(Map.of("event", getOrigin()));
+        message.put("content", getCommand());
         message.put("elapsedTimeInMilli", getElapsedTimeInMilli());
 
         try {

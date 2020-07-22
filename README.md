@@ -2,6 +2,8 @@
 
 **Videos deste projeto**: https://www.youtube.com/user/mariorez
 
+Versão **SPRING-BOOT**: https://github.com/mariorez/kanban-board
+
 ## Stack da aplicação
 
 - **JAVA** [11]: https://sdkman.io/
