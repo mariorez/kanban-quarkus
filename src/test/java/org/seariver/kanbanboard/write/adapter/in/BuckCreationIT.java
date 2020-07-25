@@ -5,7 +5,6 @@ import helper.BlankStringValueProducer;
 import helper.IntegrationHelper;
 import helper.UuidStringValueProducer;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,11 +15,11 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -38,24 +37,24 @@ class BuckCreationIT extends IntegrationHelper {
         var name = faker.pokemon().name();
 
         var template = String.format("{" +
-            "  id : $id," +
-            "  position : %s," +
-            "  name : $name" +
-            "}", position);
+                "  id : $id," +
+                "  position : %s," +
+                "  name : $name" +
+                "}", position);
 
         var payload = new JsonTemplate(template)
-            .withVar("id", externalId)
-            .withVar("name", name)
-            .prettyString();
+                .withVar("id", externalId)
+                .withVar("name", name)
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .post(ENDPOINT_PATH)
-            .then()
-            .statusCode(CREATED.getStatusCode());
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH)
+                .then()
+                .statusCode(CREATED.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var newBucket = repository.findByExternalId(UUID.fromString(externalId)).get();
@@ -70,24 +69,24 @@ class BuckCreationIT extends IntegrationHelper {
                                                  String[] errorsDetails) {
         // fixture
         var payload = new JsonTemplate(jsonTemplate)
-            .withValueProducer(new UuidStringValueProducer())
-            .withValueProducer(new BlankStringValueProducer())
-            .prettyString();
+                .withValueProducer(new UuidStringValueProducer())
+                .withValueProducer(new BlankStringValueProducer())
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .post(ENDPOINT_PATH)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Invalid parameter"))
-            .and().body("errors.field", containsInAnyOrder(errorsFields))
-            .and().body("errors.detail", containsInAnyOrder(errorsDetails))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder(errorsFields),
+                        "errors.detail", containsInAnyOrder(errorsDetails));
     }
 
     @Test
@@ -97,16 +96,16 @@ class BuckCreationIT extends IntegrationHelper {
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .post(ENDPOINT_PATH)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Malformed JSON"))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Malformed JSON"));
     }
 
     @Test
@@ -117,65 +116,65 @@ class BuckCreationIT extends IntegrationHelper {
 
         // given
         var template = "{" +
-            "  id : $externalId," +
-            "  position : $position," +
-            "  name : @s" +
-            "}";
+                "  id : $externalId," +
+                "  position : $position," +
+                "  name : @s" +
+                "}";
 
         var payload = new JsonTemplate(template)
-            .withVar("externalId", duplicatedExternalId)
-            .withVar("position", duplicatedPosition)
-            .prettyString();
+                .withVar("externalId", duplicatedExternalId)
+                .withVar("position", duplicatedPosition)
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .post(ENDPOINT_PATH)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Invalid parameter"))
-            .and().body("errors.field", containsInAnyOrder("code"))
-            .and().body("errors.detail", containsInAnyOrder("1000"))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder("code"),
+                        "errors.detail", containsInAnyOrder("1000"));
     }
 
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
-            arguments(
-                "{id:null, position:@f, name:@s}",
-                args("id"), args("must not be blank")),
-            arguments(
-                "{id:@s(length=0), position:@f, name:@s}",
-                args("id", "id"), args("must not be blank", "invalid UUID format")),
-            arguments(
-                "{id:@s(foobar), position:@f, name:@s}",
-                args("id"), args("invalid UUID format")),
-            arguments(
-                "{notExistentField:@s, position:@f, name:@s}",
-                args("id"), args("must not be blank")),
-            arguments(
-                "{id:@uuid, position:@f(-1), name:@s}",
-                args("position"), args("must be greater than 0")),
-            arguments(
-                "{id:@uuid, position:@f(0), name:@s}",
-                args("position"), args("must be greater than 0")),
-            arguments(
-                "{id:@uuid, position:@f, name:null}",
-                args("name"), args("must not be blank")),
-            arguments(
-                "{id:@uuid, position:@f, name:@s(length=0)}",
-                args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
-            arguments(
-                "{id:@uuid, position:@f, name:@blank}",
-                args("name"), args("must not be blank")),
-            arguments(
-                "{id:@uuid, position:@f, name:@s(length=101)}",
-                args("name"), args("size must be between 1 and 100"))
+                arguments(
+                        "{id:null, position:@f, name:@s}",
+                        args("id"), args("must not be blank")),
+                arguments(
+                        "{id:@s(length=0), position:@f, name:@s}",
+                        args("id", "id"), args("must not be blank", "invalid UUID format")),
+                arguments(
+                        "{id:@s(foobar), position:@f, name:@s}",
+                        args("id"), args("invalid UUID format")),
+                arguments(
+                        "{notExistentField:@s, position:@f, name:@s}",
+                        args("id"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f(-1), name:@s}",
+                        args("position"), args("must be greater than 0")),
+                arguments(
+                        "{id:@uuid, position:@f(0), name:@s}",
+                        args("position"), args("must be greater than 0")),
+                arguments(
+                        "{id:@uuid, position:@f, name:null}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@s(length=0)}",
+                        args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@blank}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@s(length=101)}",
+                        args("name"), args("size must be between 1 and 100"))
         );
     }
 }

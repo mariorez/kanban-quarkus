@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
@@ -37,19 +38,19 @@ class BucketMoveIT extends IntegrationHelper {
         var newPosition = 1.23;
 
         var template = String.format("{" +
-            "  position : %s" +
-            "}", newPosition);
+                "  position : %s" +
+                "}", newPosition);
 
         var payload = new JsonTemplate(template).prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, existentExternalId)
-            .then()
-            .statusCode(NO_CONTENT.getStatusCode());
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, existentExternalId)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
@@ -66,24 +67,24 @@ class BucketMoveIT extends IntegrationHelper {
         String existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
 
         var payload = new JsonTemplate(jsonTemplate)
-            .withValueProducer(new UuidStringValueProducer())
-            .withValueProducer(new BlankStringValueProducer())
-            .prettyString();
+                .withValueProducer(new UuidStringValueProducer())
+                .withValueProducer(new BlankStringValueProducer())
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, existentExternalId)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is(errorMessage))
-            .and().body("errors.field", containsInAnyOrder(errorsFields))
-            .and().body("errors.detail", containsInAnyOrder(errorsDetails))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, existentExternalId)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is(errorMessage),
+                        "errors.field", containsInAnyOrder(errorsFields),
+                        "errors.detail", containsInAnyOrder(errorsDetails));
     }
 
     @Test
@@ -93,25 +94,25 @@ class BucketMoveIT extends IntegrationHelper {
         var notExistentExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
 
         var template = "{" +
-            "  position : @f" +
-            "}";
+                "  position : @f" +
+                "}";
 
         var payload = new JsonTemplate(template).prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, notExistentExternalId)
-            .then()
-            .statusCode(NOT_FOUND.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is(NOT_FOUND.getReasonPhrase()))
-            .and().body("errors.field", containsInAnyOrder("code"))
-            .and().body("errors.detail", containsInAnyOrder("1001"))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, notExistentExternalId)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is(NOT_FOUND.getReasonPhrase()),
+                        "errors.field", containsInAnyOrder("code"),
+                        "errors.detail", containsInAnyOrder("1001"));
     }
 
     @Test
@@ -122,40 +123,40 @@ class BucketMoveIT extends IntegrationHelper {
 
         // given
         var template = String.format("{" +
-            "  position : %s" +
-            "}", alreadyInUsePosition);
+                "  position : %s" +
+                "}", alreadyInUsePosition);
 
         var payload = new JsonTemplate(template).prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, existentExternalId)
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Invalid parameter"))
-            .and().body("errors.field", containsInAnyOrder("code"))
-            .and().body("errors.detail", containsInAnyOrder("1000"))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, existentExternalId)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder("code"),
+                        "errors.detail", containsInAnyOrder("1000"));
     }
 
     private static Stream<Arguments> provideInvalidPositions() {
 
         return Stream.of(
-            arguments("{position:null}", "Invalid parameter",
-                args("position"), args("must be greater than 0")),
-            arguments("{position:@s}", "Invalid format",
-                args("position"), args("double")),
-            arguments("{position:0}", "Invalid parameter",
-                args("position"), args("must be greater than 0")),
-            arguments("{position:-1}", "Invalid parameter",
-                args("position"), args("must be greater than 0")),
-            arguments("{notExistent:@f}", "Invalid parameter",
-                args("position"), args("must be greater than 0"))
+                arguments("{position:null}", "Invalid parameter",
+                        args("position"), args("must be greater than 0")),
+                arguments("{position:@s}", "Invalid format",
+                        args("position"), args("double")),
+                arguments("{position:0}", "Invalid parameter",
+                        args("position"), args("must be greater than 0")),
+                arguments("{position:-1}", "Invalid parameter",
+                        args("position"), args("must be greater than 0")),
+                arguments("{notExistent:@f}", "Invalid parameter",
+                        args("position"), args("must be greater than 0"))
         );
     }
 }

@@ -10,7 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import java.util.Optional;
 
-import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.BUCKET_NOT_EXIST;
+import static org.seariver.kanbanboard.write.domain.exception.WriteException.Error.BUCKET_NOT_EXIST;
 
 @Named
 @ApplicationScoped

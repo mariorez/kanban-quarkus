@@ -8,7 +8,7 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
-import org.seariver.kanbanboard.write.CommandBus;
+import org.seariver.kanbanboard.commom.observable.ServiceBus;
 import org.seariver.kanbanboard.write.domain.application.CreateCardCommand;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -37,10 +37,10 @@ public class WriteCardRest {
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
-    private CommandBus commandBus;
+    private ServiceBus serviceBus;
 
-    public WriteCardRest(CommandBus commandBus) {
-        this.commandBus = commandBus;
+    public WriteCardRest(ServiceBus serviceBus) {
+        this.serviceBus = serviceBus;
     }
 
     @POST
@@ -59,7 +59,7 @@ public class WriteCardRest {
                 input.position,
                 input.name);
 
-        commandBus.execute(command);
+        serviceBus.execute(command);
 
         return Response.status(CREATED).build();
     }

@@ -1,7 +1,6 @@
 package helper;
 
 import org.junit.jupiter.api.Tag;
-import org.seariver.kanbanboard.write.adapter.DataSourceMock;
 
 import javax.inject.Inject;
 

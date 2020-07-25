@@ -5,7 +5,6 @@ import helper.BlankStringValueProducer;
 import helper.IntegrationHelper;
 import helper.UuidStringValueProducer;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
@@ -37,21 +37,21 @@ class BucketUpdateIT extends IntegrationHelper {
         var newName = "New Name";
 
         var template = "{" +
-            "  name : $name" +
-            "}";
+                "  name : $name" +
+                "}";
 
         var payload = new JsonTemplate(template)
-            .withVar("name", newName)
-            .prettyString();
+                .withVar("name", newName)
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, existentExternalId)
-            .then()
-            .statusCode(NO_CONTENT.getStatusCode());
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, existentExternalId)
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
         var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
@@ -65,24 +65,24 @@ class BucketUpdateIT extends IntegrationHelper {
                                                  String[] errorsDetails) {
         // fixture
         var payload = new JsonTemplate(jsonTemplate)
-            .withValueProducer(new UuidStringValueProducer())
-            .withValueProducer(new BlankStringValueProducer())
-            .prettyString();
+                .withValueProducer(new UuidStringValueProducer())
+                .withValueProducer(new BlankStringValueProducer())
+                .prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, UUID.randomUUID().toString())
-            .then()
-            .statusCode(BAD_REQUEST.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is("Invalid parameter"))
-            .and().body("errors.field", containsInAnyOrder(errorsFields))
-            .and().body("errors.detail", containsInAnyOrder(errorsDetails))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, UUID.randomUUID().toString())
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder(errorsFields),
+                        "errors.detail", containsInAnyOrder(errorsDetails));
     }
 
     @Test
@@ -92,38 +92,38 @@ class BucketUpdateIT extends IntegrationHelper {
         var notExistentExternalId = UUID.randomUUID().toString();
 
         var template = "{" +
-            "  name : @s" +
-            "}";
+                "  name : @s" +
+                "}";
 
         var payload = new JsonTemplate(template).prettyString();
 
         // verify
         given()
-            .contentType(ContentType.JSON)
-            .body(payload).log().body()
-            .when()
-            .put(ENDPOINT_PATH, notExistentExternalId)
-            .then()
-            .statusCode(NOT_FOUND.getStatusCode())
-            .contentType(ContentType.JSON)
-            .assertThat()
-            .body("message", is(NOT_FOUND.getReasonPhrase()))
-            .and().body("errors.field", containsInAnyOrder("code"))
-            .and().body("errors.detail", containsInAnyOrder("1001"))
-            .log().body();
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .put(ENDPOINT_PATH, notExistentExternalId)
+                .then()
+                .statusCode(NOT_FOUND.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is(NOT_FOUND.getReasonPhrase()),
+                        "errors.field", containsInAnyOrder("code"),
+                        "errors.detail", containsInAnyOrder("1001"));
     }
 
     private static Stream<Arguments> provideInvalidNames() {
 
         return Stream.of(
-            arguments("{name:null}",
-                args("name"), args("must not be blank")),
-            arguments("{name:@s(length=0)}",
-                args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
-            arguments("{name:@blank}",
-                args("name"), args("must not be blank")),
-            arguments("{notExistent:@s}",
-                args("name"), args("must not be blank"))
+                arguments("{name:null}",
+                        args("name"), args("must not be blank")),
+                arguments("{name:@s(length=0)}",
+                        args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
+                arguments("{name:@blank}",
+                        args("name"), args("must not be blank")),
+                arguments("{notExistent:@s}",
+                        args("name"), args("must not be blank"))
         );
     }
 }

@@ -9,7 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
-import org.seariver.kanbanboard.write.CommandBus;
+import org.seariver.kanbanboard.commom.observable.ServiceBus;
 import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
@@ -43,10 +43,10 @@ public class WriteBucketRest {
     public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
     public static final String INVALID_UUID = "invalid UUID format";
 
-    private CommandBus commandBus;
+    private ServiceBus serviceBus;
 
-    public WriteBucketRest(CommandBus commandBus) {
-        this.commandBus = commandBus;
+    public WriteBucketRest(ServiceBus serviceBus) {
+        this.serviceBus = serviceBus;
     }
 
     @POST
@@ -58,7 +58,7 @@ public class WriteBucketRest {
         logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.externalId);
 
         var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
-        commandBus.execute(command);
+        serviceBus.execute(command);
 
         return Response.status(CREATED).build();
     }
@@ -75,7 +75,7 @@ public class WriteBucketRest {
             @Valid UpdateBucketInput input) {
 
         var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
-        commandBus.execute(command);
+        serviceBus.execute(command);
 
         return Response.noContent().build();
     }
@@ -92,7 +92,7 @@ public class WriteBucketRest {
             @Valid MoveBucketInput input) {
 
         var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
-        commandBus.execute(command);
+        serviceBus.execute(command);
 
         return Response.noContent().build();
     }

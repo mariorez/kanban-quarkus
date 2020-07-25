@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.seariver.kanbanboard.write.adapter.DataSourceMock;
+import helper.DataSourceMock;
 import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;

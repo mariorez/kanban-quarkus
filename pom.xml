@@ -22,7 +22,7 @@
     <quarkus-plugin.version>1.6.0.Final</quarkus-plugin.version>
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-    <quarkus.platform.version>1.6.0.Final</quarkus.platform.version>
+    <quarkus.platform.version>1.6.1.Final</quarkus.platform.version>
     <spring-jdbc.version>5.2.7.RELEASE</spring-jdbc.version>
     <surefire-plugin.version>2.22.1</surefire-plugin.version>
   </properties>
@@ -142,10 +142,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-logging-gelf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-vertx</artifactId>
     </dependency>
   </dependencies>
   <build>

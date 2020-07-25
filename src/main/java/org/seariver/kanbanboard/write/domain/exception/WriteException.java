@@ -1,11 +1,12 @@
 package org.seariver.kanbanboard.write.domain.exception;
 
+import org.seariver.kanbanboard.commom.exception.DomainException;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class DomainException extends RuntimeException {
+public abstract class WriteException extends DomainException {
 
-    private static final long serialVersionUID = -7119093928181516799L;
     private final int code;
 
     public enum Error {
@@ -24,12 +25,12 @@ public abstract class DomainException extends RuntimeException {
 
     private final transient Map<String, Object> errors = new HashMap<>();
 
-    public DomainException(Error error) {
+    public WriteException(Error error) {
         super(error.message);
         code = error.code;
     }
 
-    public DomainException(Error error, Throwable cause) {
+    public WriteException(Error error, Throwable cause) {
         super(error.message, cause);
         code = error.code;
     }

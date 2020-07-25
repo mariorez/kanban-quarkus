@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.seariver.kanbanboard.write.domain.exception.DomainException.Error.INVALID_DUPLICATED_DATA;
+import static org.seariver.kanbanboard.write.domain.exception.WriteException.Error.INVALID_DUPLICATED_DATA;
 
 @ApplicationScoped
 public class WriteCardRepositoryImpl implements WriteCardRepository {
