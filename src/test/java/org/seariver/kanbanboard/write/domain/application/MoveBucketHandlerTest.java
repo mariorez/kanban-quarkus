@@ -25,7 +25,7 @@ public class MoveBucketHandlerTest extends TestHelper {
         // given
         var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(externalId, position);
+        var command = new MoveBucketCommand(externalId.toString(), position);
         var repository = mock(WriteBucketRepository.class);
         var bucket = new Bucket().setExternalId(externalId).setPosition(123);
         when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
@@ -47,7 +47,7 @@ public class MoveBucketHandlerTest extends TestHelper {
         // given
         var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(externalId, position);
+        var command = new MoveBucketCommand(externalId.toString(), position);
         var repository = mock(WriteBucketRepository.class);
         when(repository.findByExternalId(externalId)).thenReturn(Optional.empty());
 

@@ -78,7 +78,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response move(@PathParam("id") String externalId, BucketInput input) {
 
-        var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
+        var command = new MoveBucketCommand(externalId, input.position);
         serviceBus.execute(command);
 
         return Response.noContent().build();
