@@ -15,11 +15,6 @@ import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -53,11 +48,11 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "201", description = "Bucket created successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response create(@Valid CreateBucketInput input) {
+    public Response create(BucketInput input) {
 
         logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.externalId);
 
-        var command = new CreateBucketCommand(UUID.fromString(input.externalId), input.position, input.name);
+        var command = new CreateBucketCommand(input.externalId, input.position, input.name);
         serviceBus.execute(command);
 
         return Response.status(CREATED).build();
@@ -68,11 +63,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "201", description = "Bucket update successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response update(
-            @Valid
-            @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-            @PathParam("id") String externalId,
-            @Valid UpdateBucketInput input) {
+    public Response update(@PathParam("id") String externalId, BucketInput input) {
 
         var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
         serviceBus.execute(command);
@@ -85,11 +76,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "201", description = "Bucket moved successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response move(
-            @Valid
-            @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-            @PathParam("id") String externalId,
-            @Valid MoveBucketInput input) {
+    public Response move(@PathParam("id") String externalId, BucketInput input) {
 
         var command = new MoveBucketCommand(UUID.fromString(externalId), input.position);
         serviceBus.execute(command);
@@ -98,28 +85,10 @@ public class WriteBucketRest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class CreateBucketInput {
-        @NotBlank
-        @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+    static class BucketInput {
         @JsonProperty("id")
         public String externalId;
-        @Positive
         public double position;
-        @NotBlank
-        @Size(min = 1, max = 100)
         public String name;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    static class UpdateBucketInput {
-        @NotBlank
-        @Size(min = 1, max = 100)
-        public String name;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    static class MoveBucketInput {
-        @Positive
-        public double position;
     }
 }

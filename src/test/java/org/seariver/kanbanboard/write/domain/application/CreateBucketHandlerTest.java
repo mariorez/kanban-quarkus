@@ -25,7 +25,7 @@ public class CreateBucketHandlerTest extends TestHelper {
         var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
-        var command = new CreateBucketCommand(externalId, position, name);
+        var command = new CreateBucketCommand(externalId.toString(), position, name);
         var repository = mock(WriteBucketRepository.class);
 
         // when
