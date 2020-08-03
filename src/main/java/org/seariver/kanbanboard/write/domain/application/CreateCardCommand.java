@@ -1,27 +1,41 @@
 package org.seariver.kanbanboard.write.domain.application;
 
+import org.seariver.kanbanboard.commom.SelfValidating;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
-public class CreateCardCommand implements Command {
+public class CreateCardCommand extends SelfValidating<CreateCardCommand> implements Command {
 
-    private final UUID bucketExternalId;
-    private final UUID externalId;
+    @NotBlank
+    @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+    private final String bucketExternalId;
+    @NotBlank
+    @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
+    private final String externalId;
+    @Positive
     private final double position;
+    @NotBlank
+    @Size(min = 1, max = 100)
     private final String name;
 
-    public CreateCardCommand(UUID bucketExternalId, UUID externalId, double position, String name) {
+    public CreateCardCommand(String bucketExternalId, String externalId, double position, String name) {
         this.bucketExternalId = bucketExternalId;
         this.externalId = externalId;
         this.position = position;
         this.name = name;
+        validateSelf();
     }
 
     public UUID getBucketExternalId() {
-        return bucketExternalId;
+        return UUID.fromString(bucketExternalId);
     }
 
     public UUID getExternalId() {
-        return externalId;
+        return UUID.fromString(externalId);
     }
 
     public double getPosition() {

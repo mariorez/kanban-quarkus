@@ -33,11 +33,11 @@ public class CreateCardHandlerTest extends TestHelper {
         var externalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
-        CreateCardCommand command = new CreateCardCommand(bucketExternalId, externalId, position, name);
+        var command = new CreateCardCommand(bucketExternalId.toString(), externalId.toString(), position, name);
         var bucketRepository = mock(WriteBucketRepository.class);
         var cardRepository = mock(WriteCardRepository.class);
         when(bucketRepository.findByExternalId(bucketExternalId)).thenReturn(
-            Optional.of(new Bucket().setId(bucketId).setExternalId(bucketExternalId)));
+                Optional.of(new Bucket().setId(bucketId).setExternalId(bucketExternalId)));
 
         // when
         CreateCardHandler handler = new CreateCardHandler(bucketRepository, cardRepository);
@@ -58,7 +58,7 @@ public class CreateCardHandlerTest extends TestHelper {
 
         // given
         var notExistentBucketExternalId = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
-        var command = new CreateCardCommand(notExistentBucketExternalId, UUID.randomUUID(), 1.3, "WHATEVER");
+        var command = new CreateCardCommand(notExistentBucketExternalId.toString(), UUID.randomUUID().toString(), 1.3, "WHATEVER");
         var bucketRepository = mock(WriteBucketRepository.class);
         var cardRepository = mock(WriteCardRepository.class);
         when(bucketRepository.findByExternalId(notExistentBucketExternalId)).thenReturn(Optional.empty());

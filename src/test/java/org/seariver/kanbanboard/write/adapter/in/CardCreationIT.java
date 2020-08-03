@@ -1,17 +1,27 @@
 package org.seariver.kanbanboard.write.adapter.in;
 
 import com.github.jsontemplate.JsonTemplate;
+import helper.BlankStringValueProducer;
 import helper.IntegrationHelper;
+import helper.UuidStringValueProducer;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.seariver.kanbanboard.write.adapter.out.WriteCardRepositoryImpl;
 
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
 public class CardCreationIT extends IntegrationHelper {
@@ -52,5 +62,69 @@ public class CardCreationIT extends IntegrationHelper {
         assertThat(newCard.getBucketId()).isEqualTo(1L);
         assertThat(newCard.getName()).isEqualTo(name);
         assertThat(newCard.getPosition()).isEqualTo(position);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidData")
+    void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
+                                                 String[] errorsFields,
+                                                 String[] errorsDetails) {
+        // fixture
+        var bucketExternalId = UUID.randomUUID();
+        var payload = new JsonTemplate(jsonTemplate)
+                .withValueProducer(new UuidStringValueProducer())
+                .withValueProducer(new BlankStringValueProducer())
+                .prettyString();
+
+        // verify
+        given()
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH, bucketExternalId)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder(errorsFields),
+                        "errors.detail", containsInAnyOrder(errorsDetails));
+    }
+
+    private static Stream<Arguments> provideInvalidData() {
+
+        return Stream.of(
+                arguments(
+                        "{id:null, position:@f, name:@s}",
+                        args("id"), args("must not be blank")),
+                arguments(
+                        "{id:@s(length=0), position:@f, name:@s}",
+                        args("id", "id"), args("must not be blank", "invalid UUID format")),
+                arguments(
+                        "{id:@s(foobar), position:@f, name:@s}",
+                        args("id"), args("invalid UUID format")),
+                arguments(
+                        "{notExistentField:@s, position:@f, name:@s}",
+                        args("id"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f(-1), name:@s}",
+                        args("position"), args("must be greater than 0")),
+                arguments(
+                        "{id:@uuid, position:@f(0), name:@s}",
+                        args("position"), args("must be greater than 0")),
+                arguments(
+                        "{id:@uuid, position:@f, name:null}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@s(length=0)}",
+                        args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@blank}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, position:@f, name:@s(length=101)}",
+                        args("name"), args("size must be between 1 and 100"))
+        );
     }
 }
