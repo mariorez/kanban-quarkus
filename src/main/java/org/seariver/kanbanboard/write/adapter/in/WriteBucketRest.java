@@ -22,7 +22,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 import static javax.ws.rs.core.Response.Status.CREATED;
 
@@ -65,7 +64,7 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response update(@PathParam("id") String externalId, BucketInput input) {
 
-        var command = new UpdateBucketCommand(UUID.fromString(externalId), input.name);
+        var command = new UpdateBucketCommand(externalId, input.name);
         serviceBus.execute(command);
 
         return Response.noContent().build();

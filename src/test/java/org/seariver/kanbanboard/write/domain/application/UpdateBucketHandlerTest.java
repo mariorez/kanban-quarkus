@@ -25,7 +25,7 @@ class UpdateBucketHandlerTest extends TestHelper {
         // given
         var externalId = UUID.fromString("6d9db741-ef57-4d5a-ac0f-34f68fb0ab5e");
         var name = faker.pokemon().name();
-        var command = new UpdateBucketCommand(externalId, name);
+        var command = new UpdateBucketCommand(externalId.toString(), name);
         var repository = mock(WriteBucketRepository.class);
         var bucket = new Bucket().setExternalId(externalId).setPosition(123).setName("FOOBAR");
         when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
@@ -46,7 +46,7 @@ class UpdateBucketHandlerTest extends TestHelper {
 
         // given
         var notExistentExternalId = UUID.fromString("019641f6-6e9e-4dd9-ab02-e864a3dfa016");
-        var command = new UpdateBucketCommand(notExistentExternalId, "WHATEVER");
+        var command = new UpdateBucketCommand(notExistentExternalId.toString(), "WHATEVER");
         var repository = mock(WriteBucketRepository.class);
         when(repository.findByExternalId(notExistentExternalId)).thenReturn(Optional.empty());
 
