@@ -92,6 +92,61 @@ public class CardCreationIT extends IntegrationHelper {
                         "errors.detail", containsInAnyOrder(errorsDetails));
     }
 
+    @Test
+    void GIVEN_MalformedJson_MUST_ReturnBadRequest() {
+        // fixture
+        var bucketExternalId = UUID.randomUUID();
+        var payload = "{ malformed JSON >:{P ";
+
+        // verify
+        given()
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH, bucketExternalId)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Malformed JSON"));
+    }
+
+    @Test
+    void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
+
+        var bucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var duplicatedExternalId = "df5cf5b1-c2c7-4c02-b4d4-341d6772f193";
+        var duplicatedPosition = 200.01;
+
+        // given
+        var template = "{" +
+                "  id : $externalId," +
+                "  position : $position," +
+                "  name : @s" +
+                "}";
+
+        var payload = new JsonTemplate(template)
+                .withVar("externalId", duplicatedExternalId)
+                .withVar("position", duplicatedPosition)
+                .prettyString();
+
+        // verify
+        given()
+                .contentType(JSON)
+                .body(payload).log().body()
+                .when()
+                .post(ENDPOINT_PATH, bucketExternalId)
+                .then()
+                .statusCode(BAD_REQUEST.getStatusCode())
+                .contentType(JSON)
+                .assertThat()
+                .log().body()
+                .body("message", is("Invalid parameter"),
+                        "errors.field", containsInAnyOrder("code"),
+                        "errors.detail", containsInAnyOrder("1000"));
+    }
+
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
