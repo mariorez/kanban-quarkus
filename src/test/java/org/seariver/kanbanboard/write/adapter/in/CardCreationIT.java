@@ -26,25 +26,27 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 public class CardCreationIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{bucketExternalId}/cards";
+    public static final String ENDPOINT_PATH = "/v1/cards";
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
 
         // fixture
-        var bucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var externalId = UUID.randomUUID().toString();
+        var bucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
 
         var template = String.format("{" +
                 "  id : $id," +
+                "  bucket : $bucket," +
                 "  position : %s," +
                 "  name : $name" +
                 "}", position);
 
         var payload = new JsonTemplate(template)
                 .withVar("id", externalId)
+                .withVar("bucket", bucketExternalId)
                 .withVar("name", name)
                 .prettyString();
 
@@ -53,7 +55,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH, bucketExternalId)
+                .post(ENDPOINT_PATH)
                 .then()
                 .statusCode(CREATED.getStatusCode());
 
@@ -70,7 +72,6 @@ public class CardCreationIT extends IntegrationHelper {
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
         // fixture
-        var bucketExternalId = UUID.randomUUID();
         var payload = new JsonTemplate(jsonTemplate)
                 .withValueProducer(new UuidStringValueProducer())
                 .withValueProducer(new BlankStringValueProducer())
@@ -81,7 +82,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH, bucketExternalId)
+                .post(ENDPOINT_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -95,7 +96,6 @@ public class CardCreationIT extends IntegrationHelper {
     @Test
     void GIVEN_MalformedJson_MUST_ReturnBadRequest() {
         // fixture
-        var bucketExternalId = UUID.randomUUID();
         var payload = "{ malformed JSON >:{P ";
 
         // verify
@@ -103,7 +103,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH, bucketExternalId)
+                .post(ENDPOINT_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -122,12 +122,14 @@ public class CardCreationIT extends IntegrationHelper {
         // given
         var template = "{" +
                 "  id : $externalId," +
+                "  bucket : $bucketExternalId," +
                 "  position : $position," +
                 "  name : @s" +
                 "}";
 
         var payload = new JsonTemplate(template)
                 .withVar("externalId", duplicatedExternalId)
+                .withVar("bucketExternalId", bucketExternalId)
                 .withVar("position", duplicatedPosition)
                 .prettyString();
 
@@ -136,7 +138,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH, bucketExternalId)
+                .post(ENDPOINT_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -150,35 +152,51 @@ public class CardCreationIT extends IntegrationHelper {
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
+                //id
                 arguments(
-                        "{id:null, position:@f, name:@s}",
+                        "{id:null, bucket:@uuid, position:@f, name:@s}",
                         args("id"), args("must not be blank")),
                 arguments(
-                        "{id:@s(length=0), position:@f, name:@s}",
+                        "{id:@s(length=0), bucket:@uuid, position:@f, name:@s}",
                         args("id", "id"), args("must not be blank", "invalid UUID format")),
                 arguments(
-                        "{id:@s(foobar), position:@f, name:@s}",
+                        "{id:@s(foobar), bucket:@uuid, position:@f, name:@s}",
                         args("id"), args("invalid UUID format")),
                 arguments(
-                        "{notExistentField:@s, position:@f, name:@s}",
+                        "{notExistentField:@s, bucket:@uuid, position:@f, name:@s}",
                         args("id"), args("must not be blank")),
+                //bucket
                 arguments(
-                        "{id:@uuid, position:@f(-1), name:@s}",
+                        "{id:@uuid, bucket:null, position:@f, name:@s}",
+                        args("bucket"), args("must not be blank")),
+                arguments(
+                        "{id:@uuid, bucket:@s(length=0), position:@f, name:@s}",
+                        args("bucket", "bucket"), args("must not be blank", "invalid UUID format")),
+                arguments(
+                        "{id:@uuid, bucket:@s(foobar), position:@f, name:@s}",
+                        args("bucket"), args("invalid UUID format")),
+                arguments(
+                        "{id:@uuid, notExistentField:@s, position:@f, name:@s}",
+                        args("bucket"), args("must not be blank")),
+                //position
+                arguments(
+                        "{id:@uuid, bucket:@uuid, position:@f(-1), name:@s}",
                         args("position"), args("must be greater than 0")),
                 arguments(
-                        "{id:@uuid, position:@f(0), name:@s}",
+                        "{id:@uuid, bucket:@uuid, position:@f(0), name:@s}",
                         args("position"), args("must be greater than 0")),
+                //name
                 arguments(
-                        "{id:@uuid, position:@f, name:null}",
+                        "{id:@uuid, bucket:@uuid, position:@f, name:null}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@s(length=0)}",
+                        "{id:@uuid, bucket:@uuid, position:@f, name:@s(length=0)}",
                         args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@blank}",
+                        "{id:@uuid, bucket:@uuid, position:@f, name:@blank}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@s(length=101)}",
+                        "{id:@uuid, bucket:@uuid, position:@f, name:@s(length=101)}",
                         args("name"), args("size must be between 1 and 100"))
         );
     }
