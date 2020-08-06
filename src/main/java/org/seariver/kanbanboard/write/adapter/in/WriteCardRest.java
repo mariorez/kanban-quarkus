@@ -70,6 +70,8 @@ public class WriteCardRest {
     static class CardInput {
         @JsonProperty("id")
         public String externalId;
+        @JsonProperty("bucket")
+        public String bucketExternalId;
         public double position;
         public String name;
         public String description;
