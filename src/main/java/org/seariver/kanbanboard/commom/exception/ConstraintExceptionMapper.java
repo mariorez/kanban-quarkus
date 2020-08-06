@@ -6,12 +6,18 @@ import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Provider
 public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
 
     public static final String INVALID_PARAMETER_MESSAGE = "Invalid parameter";
+
+    private Map<String, String> fieldNameMapping = Map.ofEntries(
+            Map.entry("externalId", "id"),
+            Map.entry("bucketExternalId", "bucket")
+    );
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
@@ -22,8 +28,11 @@ public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViol
             .map(error -> {
                 var fieldPath = error.getPropertyPath().toString();
                 var fieldName = fieldPath.substring(fieldPath.lastIndexOf('.') + 1);
-                fieldName = "externalId".equals(fieldName) ? "id" : fieldName;
-                return new ErrorField(fieldName, error.getMessage());
+
+                return new ErrorField(
+                        fieldNameMapping.getOrDefault(fieldName, fieldName),
+                        error.getMessage()
+                );
             })
             .collect(Collectors.toList());
 
