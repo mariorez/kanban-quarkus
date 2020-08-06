@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 @ApplicationScoped
-@Path("v1/buckets")
+@Path("/v1/buckets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "bucket")

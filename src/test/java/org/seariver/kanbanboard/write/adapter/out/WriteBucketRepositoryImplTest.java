@@ -1,5 +1,6 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
+import helper.DataSourceMock;
 import helper.TestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import helper.DataSourceMock;
 import org.seariver.kanbanboard.write.domain.core.Bucket;
 import org.seariver.kanbanboard.write.domain.core.WriteBucketRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
@@ -43,9 +43,9 @@ class WriteBucketRepositoryImplTest extends TestHelper {
                                                                     String name) {
         // given
         var expected = new Bucket()
-            .setExternalId(externalId)
-            .setPosition(position)
-            .setName(name);
+                .setExternalId(externalId)
+                .setPosition(position)
+                .setName(name);
 
         // when
         repository.create(expected);
@@ -68,9 +68,9 @@ class WriteBucketRepositoryImplTest extends TestHelper {
                                                                           Map<String, Object> expectedError) {
         // given
         var expected = new Bucket()
-            .setExternalId(externalId)
-            .setPosition(position)
-            .setName("WHATEVER");
+                .setExternalId(externalId)
+                .setPosition(position)
+                .setName("WHATEVER");
 
         // then
         DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.create(expected));
@@ -83,11 +83,10 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @Test
     void WHEN_UpdatingBucket_WITH_ValidData_MUST_SaveOnDatabase() {
+
         // given
         var externalId = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
         var actualBucket = repository.findByExternalId(externalId).get();
-        assertThat(actualBucket.getPosition()).isEqualTo(200.987);
-        assertThat(actualBucket.getName()).isEqualTo("SECOND-BUCKET");
 
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
@@ -110,9 +109,9 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         // given
         double alreadyExistentPosition = 100.15;
         var expected = new Bucket()
-            .setExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
-            .setPosition(alreadyExistentPosition)
-            .setName("WHATEVER");
+                .setExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
+                .setPosition(alreadyExistentPosition)
+                .setName("WHATEVER");
 
         // then
         DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.update(expected));
@@ -131,8 +130,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         var existentName = "FIRST-BUCKET";
 
         return Stream.of(
-            arguments(UUID.randomUUID(), positionAsInteger, newName),
-            arguments(UUID.randomUUID(), positionAsDouble, existentName)
+                arguments(UUID.randomUUID(), positionAsInteger, newName),
+                arguments(UUID.randomUUID(), positionAsDouble, existentName)
         );
     }
 
@@ -144,10 +143,10 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         var validPosition = faker.number().randomDouble(3, 1, 10);
 
         return Stream.of(
-            arguments(existentUuid, validPosition, Map.of("id", existentUuid)),
-            arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
-            arguments(existentUuid, existentPositionSameRegister, Map.of("id", existentUuid, "position", existentPositionSameRegister)),
-            arguments(existentUuid, existentPositionAnotherRegister, Map.of("id", existentUuid, "position", existentPositionAnotherRegister))
+                arguments(existentUuid, validPosition, Map.of("id", existentUuid)),
+                arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
+                arguments(existentUuid, existentPositionSameRegister, Map.of("id", existentUuid, "position", existentPositionSameRegister)),
+                arguments(existentUuid, existentPositionAnotherRegister, Map.of("id", existentUuid, "position", existentPositionAnotherRegister))
         );
     }
 }

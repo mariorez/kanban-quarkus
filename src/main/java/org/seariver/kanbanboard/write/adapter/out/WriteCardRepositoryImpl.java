@@ -22,6 +22,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     public static final String EXTERNAL_ID = "external_id";
     public static final String POSITION_FIELD = "position";
     public static final String NAME_FIELD = "name";
+    private static final String DESCRIPTION_FIELD = "description";
     public static final String CREATED_AT_FIELD = "created_at";
     public static final String UPDATED_AT_FIELD = "updated_at";
 
@@ -66,9 +67,23 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     }
 
     @Override
+    public void update(Card card) {
+
+        var sql = "UPDATE card SET position = :position, name = :name, description = :description WHERE external_id = :external_id";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(EXTERNAL_ID, card.getExternalId())
+                .addValue(POSITION_FIELD, card.getPosition())
+                .addValue(NAME_FIELD, card.getName())
+                .addValue(DESCRIPTION_FIELD, card.getDescription());
+
+        jdbcTemplate.update(sql, parameters);
+    }
+
+    @Override
     public Optional<Card> findByExternalId(UUID externalId) {
 
-        var sql = "SELECT bucket_id, external_id, position, name, created_at, updated_at FROM card WHERE external_id = :external_id";
+        var sql = "SELECT bucket_id, external_id, position, name, description, created_at, updated_at FROM card WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(EXTERNAL_ID, externalId);
@@ -81,6 +96,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
                         .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
                         .setPosition(resultSet.getDouble(POSITION_FIELD))
                         .setName(resultSet.getString(NAME_FIELD))
+                        .setDescription(resultSet.getString(DESCRIPTION_FIELD))
                         .setCreatedAt(resultSet.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())
                         .setUpdatedAt(resultSet.getTimestamp(UPDATED_AT_FIELD).toLocalDateTime())
                 );

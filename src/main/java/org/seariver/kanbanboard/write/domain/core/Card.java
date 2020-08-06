@@ -10,6 +10,7 @@ public class Card {
     private UUID externalId;
     private double position;
     private String name;
+    private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -55,6 +56,15 @@ public class Card {
 
     public Card setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Card setDescription(String description) {
+        this.description = description;
         return this;
     }
 

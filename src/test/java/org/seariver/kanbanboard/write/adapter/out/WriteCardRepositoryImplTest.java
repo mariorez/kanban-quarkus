@@ -1,5 +1,6 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
+import helper.DataSourceMock;
 import helper.TestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import helper.DataSourceMock;
 import org.seariver.kanbanboard.write.domain.core.Card;
 import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
 import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
@@ -45,10 +45,10 @@ class WriteCardRepositoryImplTest extends TestHelper {
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
         var expected = new Card()
-            .setBucketId(bucketId)
-            .setExternalId(externalId)
-            .setPosition(position)
-            .setName(name);
+                .setBucketId(bucketId)
+                .setExternalId(externalId)
+                .setPosition(position)
+                .setName(name);
 
         // when
         repository.create(expected);
@@ -74,10 +74,10 @@ class WriteCardRepositoryImplTest extends TestHelper {
         var bucketId = 1L;
         var name = faker.pokemon().name();
         var expected = new Card()
-            .setBucketId(bucketId)
-            .setExternalId(externalId)
-            .setPosition(position)
-            .setName(name);
+                .setBucketId(bucketId)
+                .setExternalId(externalId)
+                .setPosition(position)
+                .setName(name);
 
         // then
         DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.create(expected));
@@ -88,6 +88,29 @@ class WriteCardRepositoryImplTest extends TestHelper {
         assertThat(exception.getErrors()).containsExactlyInAnyOrderEntriesOf(expectedError);
     }
 
+    @Test
+    void WHEN_UpdatingCard_WITH_ValidData_MUST_SaveOnDatabase() {
+
+        // given
+        var cardExternalId = UUID.fromString("021944cd-f516-4432-ba8d-44a312267c7d");
+        var card = repository.findByExternalId(cardExternalId).get();
+        var newName = faker.pokemon().name();
+        var newDescription = faker.lorem().paragraph();
+        var newPosition = faker.number().randomDouble(2, 1, 5);
+
+        // when
+        card.setPosition(newPosition);
+        card.setName(newName);
+        card.setDescription(newDescription);
+        repository.update(card);
+
+        // then
+        var actualCard = repository.findByExternalId(cardExternalId).get();
+        assertThat(actualCard.getName()).isEqualTo(newName);
+        assertThat(actualCard.getPosition()).isEqualTo(newPosition);
+        assertThat(actualCard.getDescription()).isEqualTo(newDescription);
+    }
+
     private static Stream<Arguments> creatingWithDuplicatedDataProvider() {
 
         var existentExternalId = UUID.fromString("021944cd-f516-4432-ba8d-44a312267c7d");
@@ -96,10 +119,10 @@ class WriteCardRepositoryImplTest extends TestHelper {
         var notInUsePosition = faker.number().randomDouble(3, 1, 10);
 
         return Stream.of(
-            arguments(existentExternalId, notInUsePosition, Map.of("id", existentExternalId)),
-            arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
-            arguments(existentExternalId, existentPositionSameRegister, Map.of("id", existentExternalId, "position", existentPositionSameRegister)),
-            arguments(existentExternalId, existentPositionAnotherRegister, Map.of("id", existentExternalId, "position", existentPositionAnotherRegister))
+                arguments(existentExternalId, notInUsePosition, Map.of("id", existentExternalId)),
+                arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
+                arguments(existentExternalId, existentPositionSameRegister, Map.of("id", existentExternalId, "position", existentPositionSameRegister)),
+                arguments(existentExternalId, existentPositionAnotherRegister, Map.of("id", existentExternalId, "position", existentPositionAnotherRegister))
         );
     }
 }
