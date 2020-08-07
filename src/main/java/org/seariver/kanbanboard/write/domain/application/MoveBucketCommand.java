@@ -11,18 +11,18 @@ public class MoveBucketCommand extends SelfValidating<MoveBucketCommand> impleme
 
     @NotBlank
     @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-    private final String externalId;
+    private final String bucketExternalId;
     @Positive
     private final double position;
 
-    public MoveBucketCommand(String externalId, double position) {
-        this.externalId = externalId;
+    public MoveBucketCommand(String bucketExternalId, double position) {
+        this.bucketExternalId = bucketExternalId;
         this.position = position;
         validateSelf();
     }
 
-    public UUID getExternalId() {
-        return UUID.fromString(externalId);
+    public UUID getBucketExternalId() {
+        return UUID.fromString(bucketExternalId);
     }
 
     public double getPosition() {

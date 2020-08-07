@@ -11,19 +11,19 @@ public class UpdateBucketCommand extends SelfValidating<UpdateBucketCommand> imp
 
     @NotBlank
     @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-    private final String externalId;
+    private final String bucketExternalId;
     @NotBlank
     @Size(min = 1, max = 100)
     private final String name;
 
-    public UpdateBucketCommand(String externalId, String name) {
-        this.externalId = externalId;
+    public UpdateBucketCommand(String bucketExternalId, String name) {
+        this.bucketExternalId = bucketExternalId;
         this.name = name;
         validateSelf();
     }
 
-    public UUID getExternalId() {
-        return UUID.fromString(externalId);
+    public UUID getBucketExternalId() {
+        return UUID.fromString(bucketExternalId);
     }
 
     public String getName() {

@@ -21,8 +21,8 @@ public class CardUpdateIT extends IntegrationHelper {
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
-        // fixture
-        var externalId = "021944cd-f516-4432-ba8d-44a312267c7d";
+        // setup
+        var cardExternalId = "021944cd-f516-4432-ba8d-44a312267c7d";
         var name = faker.pokemon().name();
         var description = faker.lorem().paragraph();
 
@@ -41,12 +41,12 @@ public class CardUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, externalId)
+                .put(ENDPOINT_PATH, cardExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteCardRepositoryImpl(dataSource);
-        var updatedCard = repository.findByExternalId(UUID.fromString(externalId)).get();
+        var updatedCard = repository.findByExternalId(UUID.fromString(cardExternalId)).get();
         assertThat(updatedCard.getName()).isEqualTo(name);
         assertThat(updatedCard.getDescription()).isEqualTo(description);
     }

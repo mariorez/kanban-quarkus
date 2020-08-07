@@ -7,7 +7,7 @@ public class Card {
 
     private Long id;
     private Long bucketId;
-    private UUID externalId;
+    private UUID cardExternalId;
     private double position;
     private String name;
     private String description;
@@ -32,12 +32,12 @@ public class Card {
         return this;
     }
 
-    public UUID getExternalId() {
-        return externalId;
+    public UUID getCardExternalId() {
+        return cardExternalId;
     }
 
-    public Card setExternalId(UUID externalId) {
-        this.externalId = externalId;
+    public Card setCardExternalId(UUID cardExternalId) {
+        this.cardExternalId = cardExternalId;
         return this;
     }
 

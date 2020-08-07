@@ -1,6 +1,5 @@
-package org.seariver.kanbanboard.read.application;
+package org.seariver.kanbanboard.read.domain.application;
 
-import org.seariver.kanbanboard.read.domain.application.Query;
 import org.seariver.kanbanboard.read.domain.core.BucketDto;
 
 import java.util.List;

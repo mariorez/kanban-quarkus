@@ -12,7 +12,12 @@ import org.seariver.kanbanboard.write.domain.application.CreateCardCommand;
 import org.seariver.kanbanboard.write.domain.application.UpdateCardCommand;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -20,7 +25,7 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 @ApplicationScoped
-@Path("/v1/cards")
+@Path("cards")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "card")
@@ -37,9 +42,10 @@ public class WriteCardRest {
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(CardInput input) {
+
         var command = new CreateCardCommand(
                 input.bucketExternalId,
-                input.externalId,
+                input.cardExternalId,
                 input.position,
                 input.name);
 
@@ -49,11 +55,12 @@ public class WriteCardRest {
     }
 
     @PUT
-    @Path("/{id}")
+    @Path("{id}")
     @APIResponse(responseCode = "201", description = "Card created successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response update(@PathParam("id") String externalId, CardInput input) {
+
         var command = new UpdateCardCommand(externalId, input.name, input.description);
 
         serviceBus.execute(command);
@@ -63,10 +70,10 @@ public class WriteCardRest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class CardInput {
-        @JsonProperty("id")
-        public String externalId;
-        @JsonProperty("bucket")
+        @JsonProperty("bucketId")
         public String bucketExternalId;
+        @JsonProperty("cardId")
+        public String cardExternalId;
         public double position;
         public String name;
         public String description;

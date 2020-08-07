@@ -17,7 +17,7 @@ public class UpdateCardHandler implements Handler<UpdateCardCommand> {
 
     public void handle(UpdateCardCommand command) {
 
-        var optionalCard = repository.findByExternalId(command.getExternalId());
+        var optionalCard = repository.findByExternalId(command.getCardExternalId());
         var card = optionalCard.get();
 
         card.setName(command.getName());

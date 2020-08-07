@@ -15,8 +15,8 @@ public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViol
     public static final String INVALID_PARAMETER_MESSAGE = "Invalid parameter";
 
     private Map<String, String> fieldNameMapping = Map.ofEntries(
-            Map.entry("externalId", "id"),
-            Map.entry("bucketExternalId", "bucket")
+            Map.entry("bucketExternalId", "bucketId"),
+            Map.entry("cardExternalId", "cardId")
     );
 
     @Override
@@ -39,8 +39,8 @@ public class ConstraintExceptionMapper implements ExceptionMapper<ConstraintViol
         var errorResult = new ResponseError(INVALID_PARAMETER_MESSAGE, errors);
 
         return Response
-            .status(Response.Status.BAD_REQUEST)
-            .entity(errorResult)
-            .build();
+                .status(Response.Status.BAD_REQUEST)
+                .entity(errorResult)
+                .build();
     }
 }

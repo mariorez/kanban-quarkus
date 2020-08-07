@@ -38,12 +38,12 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("validDataProvider")
-    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID externalId,
+    void WHEN_CreatingBucket_GIVEN_ValidData_MUST_PersistOnDatabase(UUID bucketExternalId,
                                                                     double position,
                                                                     String name) {
         // given
         var expected = new Bucket()
-                .setExternalId(externalId)
+                .setBucketExternalId(bucketExternalId)
                 .setPosition(position)
                 .setName(name);
 
@@ -51,10 +51,10 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.create(expected);
 
         // then
-        var actualOptional = repository.findByExternalId(externalId);
+        var actualOptional = repository.findByExternalId(bucketExternalId);
         var actual = actualOptional.get();
         assertThat(actual.getId()).isPositive();
-        assertThat(actual.getExternalId()).isEqualTo(expected.getExternalId());
+        assertThat(actual.getBucketExternalId()).isEqualTo(expected.getBucketExternalId());
         assertThat(actual.getPosition()).isEqualTo(expected.getPosition());
         assertThat(actual.getName()).isEqualTo(expected.getName());
         assertThat(actual.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -63,17 +63,18 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("creatingWithDuplicatedDataProvider")
-    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID externalId,
+    void WHEN_CreatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID bucketExternalId,
                                                                           double position,
                                                                           Map<String, Object> expectedError) {
         // given
         var expected = new Bucket()
-                .setExternalId(externalId)
+                .setBucketExternalId(bucketExternalId)
                 .setPosition(position)
                 .setName("WHATEVER");
 
         // then
-        DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.create(expected));
+        DuplicatedDataException exception = assertThrows(
+                DuplicatedDataException.class, () -> repository.create(expected));
 
         // when
         assertThat(exception.getMessage()).isEqualTo("Invalid duplicated data");
@@ -85,8 +86,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
     void WHEN_UpdatingBucket_WITH_ValidData_MUST_SaveOnDatabase() {
 
         // given
-        var externalId = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
-        var actualBucket = repository.findByExternalId(externalId).get();
+        var bucketExternalId = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
+        var actualBucket = repository.findByExternalId(bucketExternalId).get();
 
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
@@ -96,8 +97,8 @@ class WriteBucketRepositoryImplTest extends TestHelper {
         repository.update(actualBucket);
 
         // then
-        var expectedBucket = repository.findByExternalId(externalId).get();
-        assertThat(expectedBucket.getExternalId()).isEqualTo(externalId);
+        var expectedBucket = repository.findByExternalId(bucketExternalId).get();
+        assertThat(expectedBucket.getBucketExternalId()).isEqualTo(bucketExternalId);
         assertThat(expectedBucket.getPosition()).isEqualTo(position);
         assertThat(expectedBucket.getName()).isEqualTo(name);
         assertThat(expectedBucket.getCreatedAt()).isNotNull();
@@ -106,15 +107,17 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     @Test
     void WHEN_UpdatingBucket_GIVEN_AlreadyExistentKey_MUST_ThrowException() {
+
         // given
         double alreadyExistentPosition = 100.15;
         var expected = new Bucket()
-                .setExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
+                .setBucketExternalId(UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db"))
                 .setPosition(alreadyExistentPosition)
                 .setName("WHATEVER");
 
         // then
-        DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.update(expected));
+        DuplicatedDataException exception = assertThrows(
+                DuplicatedDataException.class, () -> repository.update(expected));
 
         // when
         assertThat(exception.getMessage()).isEqualTo("Invalid duplicated data");
@@ -137,16 +140,16 @@ class WriteBucketRepositoryImplTest extends TestHelper {
 
     private static Stream<Arguments> creatingWithDuplicatedDataProvider() {
 
-        var existentUuid = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
+        var existentBucketExternalId = UUID.fromString("3731c747-ea27-42e5-a52b-1dfbfa9617db");
         var existentPositionSameRegister = 200.987;
         var existentPositionAnotherRegister = 100.15;
         var validPosition = faker.number().randomDouble(3, 1, 10);
 
         return Stream.of(
-                arguments(existentUuid, validPosition, Map.of("id", existentUuid)),
+                arguments(existentBucketExternalId, validPosition, Map.of("id", existentBucketExternalId)),
                 arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
-                arguments(existentUuid, existentPositionSameRegister, Map.of("id", existentUuid, "position", existentPositionSameRegister)),
-                arguments(existentUuid, existentPositionAnotherRegister, Map.of("id", existentUuid, "position", existentPositionAnotherRegister))
+                arguments(existentBucketExternalId, existentPositionSameRegister, Map.of("id", existentBucketExternalId, "position", existentPositionSameRegister)),
+                arguments(existentBucketExternalId, existentPositionAnotherRegister, Map.of("id", existentBucketExternalId, "position", existentPositionAnotherRegister))
         );
     }
 }

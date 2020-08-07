@@ -27,13 +27,13 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BucketUpdateIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{id}";
+    public static final String ENDPOINT_PATH = "/v1/buckets/{bucketExternalId}";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
-        // fixture
-        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        // setup
+        var existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var newName = "New Name";
 
         var template = "{" +
@@ -49,12 +49,12 @@ class BucketUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentExternalId)
+                .put(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(existentBucketExternalId)).get();
         assertThat(actualBucket.getName()).isEqualTo(newName);
     }
 
@@ -63,7 +63,7 @@ class BucketUpdateIT extends IntegrationHelper {
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
-        // fixture
+        // setup
         var payload = new JsonTemplate(jsonTemplate)
                 .withValueProducer(new UuidStringValueProducer())
                 .withValueProducer(new BlankStringValueProducer())
@@ -88,8 +88,8 @@ class BucketUpdateIT extends IntegrationHelper {
     @Test
     void GIVEN_NotExistentExternalId_MUST_ReturnBadRequest() {
 
-        // fixture
-        var notExistentExternalId = UUID.randomUUID().toString();
+        // setup
+        var notExistentBucketExternalId = UUID.randomUUID().toString();
 
         var template = "{" +
                 "  name : @s" +
@@ -102,7 +102,7 @@ class BucketUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, notExistentExternalId)
+                .put(ENDPOINT_PATH, notExistentBucketExternalId)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode())
                 .contentType(JSON)

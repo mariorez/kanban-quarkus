@@ -22,7 +22,7 @@ public class UpdateBucketHandler implements Handler<UpdateBucketCommand> {
 
     public void handle(UpdateBucketCommand command) {
 
-        Optional<Bucket> bucketOptional = repository.findByExternalId(command.getExternalId());
+        Optional<Bucket> bucketOptional = repository.findByExternalId(command.getBucketExternalId());
 
         if (!bucketOptional.isPresent()) {
             throw new BucketNotExistentException(BUCKET_NOT_EXIST);

@@ -19,7 +19,7 @@ public class CreateBucketHandler implements Handler<CreateBucketCommand> {
     public void handle(CreateBucketCommand command) {
 
         var bucket = new Bucket()
-                .setExternalId(command.getExternalId())
+                .setBucketExternalId(command.getBucketExternalId())
                 .setPosition(command.getPosition())
                 .setName(command.getName());
 

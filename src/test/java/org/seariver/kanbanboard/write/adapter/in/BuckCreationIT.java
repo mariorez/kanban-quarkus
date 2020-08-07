@@ -31,19 +31,19 @@ class BuckCreationIT extends IntegrationHelper {
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
 
-        // fixture
+        // setup
         var externalId = UUID.randomUUID().toString();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
 
         var template = String.format("{" +
-                "  id : $id," +
+                "  bucketId : $bucketId," +
                 "  position : %s," +
                 "  name : $name" +
                 "}", position);
 
         var payload = new JsonTemplate(template)
-                .withVar("id", externalId)
+                .withVar("bucketId", externalId)
                 .withVar("name", name)
                 .prettyString();
 
@@ -67,7 +67,7 @@ class BuckCreationIT extends IntegrationHelper {
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
-        // fixture
+        // setup
         var payload = new JsonTemplate(jsonTemplate)
                 .withValueProducer(new UuidStringValueProducer())
                 .withValueProducer(new BlankStringValueProducer())
@@ -91,7 +91,8 @@ class BuckCreationIT extends IntegrationHelper {
 
     @Test
     void GIVEN_MalformedJson_MUST_ReturnBadRequest() {
-        // fixture
+
+        // setup
         var payload = "{ malformed JSON >:{P ";
 
         // verify
@@ -111,18 +112,18 @@ class BuckCreationIT extends IntegrationHelper {
     @Test
     void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
 
+        // setup
         var duplicatedExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var duplicatedPosition = 100.15;
 
-        // given
         var template = "{" +
-                "  id : $externalId," +
+                "  bucketId : $bucketId," +
                 "  position : $position," +
                 "  name : @s" +
                 "}";
 
         var payload = new JsonTemplate(template)
-                .withVar("externalId", duplicatedExternalId)
+                .withVar("bucketId", duplicatedExternalId)
                 .withVar("position", duplicatedPosition)
                 .prettyString();
 
@@ -145,35 +146,44 @@ class BuckCreationIT extends IntegrationHelper {
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
-                arguments(
-                        "{id:null, position:@f, name:@s}",
-                        args("id"), args("must not be blank")),
-                arguments(
-                        "{id:@s(length=0), position:@f, name:@s}",
-                        args("id", "id"), args("must not be blank", "invalid UUID format")),
-                arguments(
-                        "{id:@s(foobar), position:@f, name:@s}",
-                        args("id"), args("invalid UUID format")),
+                // invalid bucketId parameter entries
                 arguments(
                         "{notExistentField:@s, position:@f, name:@s}",
-                        args("id"), args("must not be blank")),
+                        args("bucketId"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, position:@f(-1), name:@s}",
+                        "{bucketId:null, position:@f, name:@s}",
+                        args("bucketId"), args("must not be blank")),
+                arguments(
+                        "{bucketId:@s(length=0), position:@f, name:@s}",
+                        args("bucketId", "bucketId"), args("must not be blank", "invalid UUID format")),
+                arguments(
+                        "{bucketId:@s(foobar), position:@f, name:@s}",
+                        args("bucketId"), args("invalid UUID format")),
+                // invalid position parameter entries
+                arguments(
+                        "{bucketId:@uuid, notExistentField:@f, name:@s}",
                         args("position"), args("must be greater than 0")),
                 arguments(
-                        "{id:@uuid, position:@f(0), name:@s}",
+                        "{bucketId:@uuid, position:@f(-1), name:@s}",
                         args("position"), args("must be greater than 0")),
                 arguments(
-                        "{id:@uuid, position:@f, name:null}",
+                        "{bucketId:@uuid, position:@f(0), name:@s}",
+                        args("position"), args("must be greater than 0")),
+                // invalid name parameter entries
+                arguments(
+                        "{bucketId:@uuid, position:@f, notExistentField:@s}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@s(length=0)}",
+                        "{bucketId:@uuid, position:@f, name:null}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{bucketId:@uuid, position:@f, name:@s(length=0)}",
                         args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@blank}",
+                        "{bucketId:@uuid, position:@f, name:@blank}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, position:@f, name:@s(length=101)}",
+                        "{bucketId:@uuid, position:@f, name:@s(length=101)}",
                         args("name"), args("size must be between 1 and 100"))
         );
     }

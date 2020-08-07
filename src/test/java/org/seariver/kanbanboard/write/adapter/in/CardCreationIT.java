@@ -31,22 +31,22 @@ public class CardCreationIT extends IntegrationHelper {
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
 
-        // fixture
-        var externalId = UUID.randomUUID().toString();
+        // setup
         var bucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var cardExternalId = UUID.randomUUID().toString();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
 
         var template = String.format("{" +
-                "  id : $id," +
-                "  bucket : $bucket," +
+                "  bucketId : $bucketId," +
+                "  cardId : $cardId," +
                 "  position : %s," +
                 "  name : $name" +
                 "}", position);
 
         var payload = new JsonTemplate(template)
-                .withVar("id", externalId)
-                .withVar("bucket", bucketExternalId)
+                .withVar("bucketId", bucketExternalId)
+                .withVar("cardId", cardExternalId)
                 .withVar("name", name)
                 .prettyString();
 
@@ -60,10 +60,12 @@ public class CardCreationIT extends IntegrationHelper {
                 .statusCode(CREATED.getStatusCode());
 
         var repository = new WriteCardRepositoryImpl(dataSource);
-        var newCard = repository.findByExternalId(UUID.fromString(externalId)).get();
+        var newCard = repository.findByExternalId(UUID.fromString(cardExternalId)).get();
         assertThat(newCard.getBucketId()).isEqualTo(1L);
+        assertThat(newCard.getCardExternalId().toString()).isEqualTo(cardExternalId);
         assertThat(newCard.getName()).isEqualTo(name);
         assertThat(newCard.getPosition()).isEqualTo(position);
+        assertThat(newCard.getDescription()).isNull();
     }
 
     @ParameterizedTest
@@ -71,7 +73,7 @@ public class CardCreationIT extends IntegrationHelper {
     void GIVEN_InvalidData_MUST_ReturnBadRequest(String jsonTemplate,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
-        // fixture
+        // setup
         var payload = new JsonTemplate(jsonTemplate)
                 .withValueProducer(new UuidStringValueProducer())
                 .withValueProducer(new BlankStringValueProducer())
@@ -95,7 +97,8 @@ public class CardCreationIT extends IntegrationHelper {
 
     @Test
     void GIVEN_MalformedJson_MUST_ReturnBadRequest() {
-        // fixture
+
+        // setup
         var payload = "{ malformed JSON >:{P ";
 
         // verify
@@ -115,22 +118,22 @@ public class CardCreationIT extends IntegrationHelper {
     @Test
     void GIVEN_DuplicatedKey_MUST_ReturnBadRequest() {
 
-        var bucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
-        var duplicatedExternalId = "df5cf5b1-c2c7-4c02-b4d4-341d6772f193";
+        // setup
+        var existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        var duplicatedCardExternalId = "df5cf5b1-c2c7-4c02-b4d4-341d6772f193";
         var duplicatedPosition = 200.01;
 
-        // given
         var template = "{" +
-                "  id : $externalId," +
-                "  bucket : $bucketExternalId," +
-                "  position : $position," +
+                "  bucketId : $existentBucketExternalId," +
+                "  cardId : $duplicatedCardExternalId," +
+                "  position : $duplicatedPosition," +
                 "  name : @s" +
                 "}";
 
         var payload = new JsonTemplate(template)
-                .withVar("externalId", duplicatedExternalId)
-                .withVar("bucketExternalId", bucketExternalId)
-                .withVar("position", duplicatedPosition)
+                .withVar("existentBucketExternalId", existentBucketExternalId)
+                .withVar("duplicatedCardExternalId", duplicatedCardExternalId)
+                .withVar("duplicatedPosition", duplicatedPosition)
                 .prettyString();
 
         // verify
@@ -152,51 +155,61 @@ public class CardCreationIT extends IntegrationHelper {
     private static Stream<Arguments> provideInvalidData() {
 
         return Stream.of(
-                //id
+
+                // invalid bucketId entries
                 arguments(
-                        "{id:null, bucket:@uuid, position:@f, name:@s}",
-                        args("id"), args("must not be blank")),
+                        "{notExistentField:@s, cardId:@uuid, position:@f, name:@s}",
+                        args("bucketId"), args("must not be blank")),
                 arguments(
-                        "{id:@s(length=0), bucket:@uuid, position:@f, name:@s}",
-                        args("id", "id"), args("must not be blank", "invalid UUID format")),
+                        "{bucketId:null, cardId:@uuid, position:@f, name:@s}",
+                        args("bucketId"), args("must not be blank")),
                 arguments(
-                        "{id:@s(foobar), bucket:@uuid, position:@f, name:@s}",
-                        args("id"), args("invalid UUID format")),
+                        "{bucketId:@s(length=0), cardId:@uuid, position:@f, name:@s}",
+                        args("bucketId", "bucketId"), args("must not be blank", "invalid UUID format")),
                 arguments(
-                        "{notExistentField:@s, bucket:@uuid, position:@f, name:@s}",
-                        args("id"), args("must not be blank")),
-                //bucket
+                        "{bucketId:@s(foobar), cardId:@uuid, position:@f, name:@s}",
+                        args("bucketId"), args("invalid UUID format")),
+
+                // invalid cardId entries
                 arguments(
-                        "{id:@uuid, bucket:null, position:@f, name:@s}",
-                        args("bucket"), args("must not be blank")),
+                        "{bucketId:@uuid, notExistentField:@s, position:@f, name:@s}",
+                        args("cardId"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, bucket:@s(length=0), position:@f, name:@s}",
-                        args("bucket", "bucket"), args("must not be blank", "invalid UUID format")),
+                        "{bucketId:@uuid, cardId:null, position:@f, name:@s}",
+                        args("cardId"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, bucket:@s(foobar), position:@f, name:@s}",
-                        args("bucket"), args("invalid UUID format")),
+                        "{bucketId:@uuid, cardId:@s(length=0), position:@f, name:@s}",
+                        args("cardId", "cardId"), args("must not be blank", "invalid UUID format")),
                 arguments(
-                        "{id:@uuid, notExistentField:@s, position:@f, name:@s}",
-                        args("bucket"), args("must not be blank")),
-                //position
+                        "{bucketId:@uuid, cardId:@s(foobar), position:@f, name:@s}",
+                        args("cardId"), args("invalid UUID format")),
+
+                // invalid position entries
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f(-1), name:@s}",
+                        "{bucketId:@uuid, cardId:@uuid, notExistentField:@f, name:@s}",
                         args("position"), args("must be greater than 0")),
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f(0), name:@s}",
+                        "{bucketId:@uuid, cardId:@uuid, position:@f(-1), name:@s}",
                         args("position"), args("must be greater than 0")),
-                //name
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f, name:null}",
+                        "{bucketId:@uuid, cardId:@uuid, position:@f(0), name:@s}",
+                        args("position"), args("must be greater than 0")),
+
+                // invalid NAME parameter entries
+                arguments(
+                        "{bucketId:@uuid, cardId:@uuid, position:@f, notExistentField:@s}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f, name:@s(length=0)}",
+                        "{bucketId:@uuid, cardId:@uuid, position:@f, name:null}",
+                        args("name"), args("must not be blank")),
+                arguments(
+                        "{bucketId:@uuid, cardId:@uuid, position:@f, name:@s(length=0)}",
                         args("name", "name"), args("must not be blank", "size must be between 1 and 100")),
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f, name:@blank}",
+                        "{bucketId:@uuid, cardId:@uuid, position:@f, name:@blank}",
                         args("name"), args("must not be blank")),
                 arguments(
-                        "{id:@uuid, bucket:@uuid, position:@f, name:@s(length=101)}",
+                        "{bucketId:@uuid, cardId:@uuid, position:@f, name:@s(length=101)}",
                         args("name"), args("size must be between 1 and 100"))
         );
     }

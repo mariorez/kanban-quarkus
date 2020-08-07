@@ -1,6 +1,5 @@
-package org.seariver.kanbanboard.read.application;
+package org.seariver.kanbanboard.read.domain.application;
 
-import org.seariver.kanbanboard.read.domain.application.Resolver;
 import org.seariver.kanbanboard.read.domain.core.BucketDto;
 import org.seariver.kanbanboard.read.domain.core.ReadBucketRepository;
 

@@ -1,5 +1,6 @@
-package org.seariver.kanbanboard.read.application;
+package org.seariver.kanbanboard.read.domain.application;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.seariver.kanbanboard.read.domain.core.BucketDto;
 import org.seariver.kanbanboard.read.domain.core.CardDto;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Tag("unit")
 public class ListAllBucketResolverTest {
 
     @Test

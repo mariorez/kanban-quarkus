@@ -26,16 +26,13 @@ import javax.ws.rs.core.Response;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 @ApplicationScoped
-@Path("/v1/buckets")
+@Path("buckets")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "bucket")
 public class WriteBucketRest {
 
     final static Logger logger = Logger.getLogger(WriteBucketRest.class);
-
-    public static final String UUID_FORMAT = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$";
-    public static final String INVALID_UUID = "invalid UUID format";
 
     private ServiceBus serviceBus;
 
@@ -49,9 +46,9 @@ public class WriteBucketRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response create(BucketInput input) {
 
-        logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.externalId);
+        logger.infov("ENTRYPOINT:HTTP:Bucket Creation:{0}", input.bucketExternalId);
 
-        var command = new CreateBucketCommand(input.externalId, input.position, input.name);
+        var command = new CreateBucketCommand(input.bucketExternalId, input.position, input.name);
         serviceBus.execute(command);
 
         return Response.status(CREATED).build();
@@ -85,8 +82,8 @@ public class WriteBucketRest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class BucketInput {
-        @JsonProperty("id")
-        public String externalId;
+        @JsonProperty("bucketId")
+        public String bucketExternalId;
         public double position;
         public String name;
     }

@@ -28,13 +28,13 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BucketMoveIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{id}/move";
+    public static final String ENDPOINT_PATH = "/v1/buckets/{bucketExternalId}/move";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
 
-        // fixture
-        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        // setup
+        var existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var newPosition = 1.23;
 
         var template = String.format("{" +
@@ -48,12 +48,12 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentExternalId)
+                .put(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
         var repository = new WriteBucketRepositoryImpl(dataSource);
-        var actualBucket = repository.findByExternalId(UUID.fromString(existentExternalId)).get();
+        var actualBucket = repository.findByExternalId(UUID.fromString(existentBucketExternalId)).get();
         assertThat(actualBucket.getPosition()).isEqualTo(newPosition);
     }
 
@@ -63,8 +63,8 @@ class BucketMoveIT extends IntegrationHelper {
                                                  String errorMessage,
                                                  String[] errorsFields,
                                                  String[] errorsDetails) {
-        // fixture
-        String existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        // setup
+        String existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
 
         var payload = new JsonTemplate(jsonTemplate)
                 .withValueProducer(new UuidStringValueProducer())
@@ -76,7 +76,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentExternalId)
+                .put(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -90,8 +90,8 @@ class BucketMoveIT extends IntegrationHelper {
     @Test
     void GIVEN_NotExistentExternalId_MUST_ReturnBadRequest() {
 
-        // fixture
-        var notExistentExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
+        // setup
+        var notExistentBucketExternalId = "effce142-1a08-49d4-9fe6-3fe728b17a41";
 
         var template = "{" +
                 "  position : @f" +
@@ -104,7 +104,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, notExistentExternalId)
+                .put(ENDPOINT_PATH, notExistentBucketExternalId)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode())
                 .contentType(JSON)
@@ -118,10 +118,10 @@ class BucketMoveIT extends IntegrationHelper {
     @Test
     void GIVEN_DuplicatedPosition_MUST_ReturnBadRequest() {
 
-        var existentExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
+        // setup
+        var existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var alreadyInUsePosition = 100.15;
 
-        // given
         var template = String.format("{" +
                 "  position : %s" +
                 "}", alreadyInUsePosition);
@@ -133,7 +133,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentExternalId)
+                .put(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

@@ -41,12 +41,12 @@ class WriteCardRepositoryImplTest extends TestHelper {
 
         // given
         var bucketId = 1L;
-        var externalId = UUID.randomUUID();
+        var cardExternalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
         var expected = new Card()
                 .setBucketId(bucketId)
-                .setExternalId(externalId)
+                .setCardExternalId(cardExternalId)
                 .setPosition(position)
                 .setName(name);
 
@@ -54,10 +54,10 @@ class WriteCardRepositoryImplTest extends TestHelper {
         repository.create(expected);
 
         // then
-        var actualOptional = repository.findByExternalId(externalId);
+        var actualOptional = repository.findByExternalId(cardExternalId);
         Card actual = actualOptional.get();
         assertThat(actual.getBucketId()).isEqualTo(bucketId);
-        assertThat(actual.getExternalId()).isEqualTo(expected.getExternalId());
+        assertThat(actual.getCardExternalId()).isEqualTo(expected.getCardExternalId());
         assertThat(actual.getPosition()).isEqualTo(expected.getPosition());
         assertThat(actual.getName()).isEqualTo(expected.getName());
         assertThat(actual.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
@@ -66,7 +66,7 @@ class WriteCardRepositoryImplTest extends TestHelper {
 
     @ParameterizedTest
     @MethodSource("creatingWithDuplicatedDataProvider")
-    void WHEN_CreatingCard_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID externalId,
+    void WHEN_CreatingCard_GIVEN_AlreadyExistentKey_MUST_ThrowException(UUID cardExternalId,
                                                                         double position,
                                                                         Map<String, Object> expectedError) {
 
@@ -75,12 +75,13 @@ class WriteCardRepositoryImplTest extends TestHelper {
         var name = faker.pokemon().name();
         var expected = new Card()
                 .setBucketId(bucketId)
-                .setExternalId(externalId)
+                .setCardExternalId(cardExternalId)
                 .setPosition(position)
                 .setName(name);
 
         // then
-        DuplicatedDataException exception = assertThrows(DuplicatedDataException.class, () -> repository.create(expected));
+        DuplicatedDataException exception = assertThrows(
+                DuplicatedDataException.class, () -> repository.create(expected));
 
         // when
         assertThat(exception.getMessage()).isEqualTo("Invalid duplicated data");
@@ -113,16 +114,16 @@ class WriteCardRepositoryImplTest extends TestHelper {
 
     private static Stream<Arguments> creatingWithDuplicatedDataProvider() {
 
-        var existentExternalId = UUID.fromString("021944cd-f516-4432-ba8d-44a312267c7d");
+        var existentCardExternalId = UUID.fromString("021944cd-f516-4432-ba8d-44a312267c7d");
         var existentPositionSameRegister = 200.01;
         var existentPositionAnotherRegister = 100.01;
         var notInUsePosition = faker.number().randomDouble(3, 1, 10);
 
         return Stream.of(
-                arguments(existentExternalId, notInUsePosition, Map.of("id", existentExternalId)),
+                arguments(existentCardExternalId, notInUsePosition, Map.of("id", existentCardExternalId)),
                 arguments(UUID.randomUUID(), existentPositionSameRegister, Map.of("position", existentPositionSameRegister)),
-                arguments(existentExternalId, existentPositionSameRegister, Map.of("id", existentExternalId, "position", existentPositionSameRegister)),
-                arguments(existentExternalId, existentPositionAnotherRegister, Map.of("id", existentExternalId, "position", existentPositionAnotherRegister))
+                arguments(existentCardExternalId, existentPositionSameRegister, Map.of("id", existentCardExternalId, "position", existentPositionSameRegister)),
+                arguments(existentCardExternalId, existentPositionAnotherRegister, Map.of("id", existentCardExternalId, "position", existentPositionAnotherRegister))
         );
     }
 }

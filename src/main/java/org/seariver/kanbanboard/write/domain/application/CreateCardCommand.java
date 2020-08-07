@@ -15,16 +15,16 @@ public class CreateCardCommand extends SelfValidating<CreateCardCommand> impleme
     private final String bucketExternalId;
     @NotBlank
     @Pattern(regexp = UUID_FORMAT, message = INVALID_UUID)
-    private final String externalId;
+    private final String cardExternalId;
     @Positive
     private final double position;
     @NotBlank
     @Size(min = 1, max = 100)
     private final String name;
 
-    public CreateCardCommand(String bucketExternalId, String externalId, double position, String name) {
+    public CreateCardCommand(String bucketExternalId, String cardExternalId, double position, String name) {
         this.bucketExternalId = bucketExternalId;
-        this.externalId = externalId;
+        this.cardExternalId = cardExternalId;
         this.position = position;
         this.name = name;
         validateSelf();
@@ -34,8 +34,8 @@ public class CreateCardCommand extends SelfValidating<CreateCardCommand> impleme
         return UUID.fromString(bucketExternalId);
     }
 
-    public UUID getExternalId() {
-        return UUID.fromString(externalId);
+    public UUID getCardExternalId() {
+        return UUID.fromString(cardExternalId);
     }
 
     public double getPosition() {

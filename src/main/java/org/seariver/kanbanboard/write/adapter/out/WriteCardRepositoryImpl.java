@@ -40,7 +40,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
 
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue(BUCKET_ID_FIELD, card.getBucketId())
-                    .addValue(EXTERNAL_ID, card.getExternalId())
+                    .addValue(EXTERNAL_ID, card.getCardExternalId())
                     .addValue(POSITION_FIELD, card.getPosition())
                     .addValue(NAME_FIELD, card.getName());
 
@@ -50,11 +50,11 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
 
             var duplicatedException = new DuplicatedDataException(INVALID_DUPLICATED_DATA, exception);
 
-            List<Card> existentCards = findByExternalIdOrPosition(card.getExternalId(), card.getPosition());
+            List<Card> existentCards = findByExternalIdOrPosition(card.getCardExternalId(), card.getPosition());
 
             existentCards.forEach(existentCard -> {
-                if (existentCard.getExternalId().equals(card.getExternalId())) {
-                    duplicatedException.addError("id", card.getExternalId());
+                if (existentCard.getCardExternalId().equals(card.getCardExternalId())) {
+                    duplicatedException.addError("id", card.getCardExternalId());
                 }
 
                 if (existentCard.getPosition() == card.getPosition()) {
@@ -72,7 +72,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
         var sql = "UPDATE card SET position = :position, name = :name, description = :description WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue(EXTERNAL_ID, card.getExternalId())
+                .addValue(EXTERNAL_ID, card.getCardExternalId())
                 .addValue(POSITION_FIELD, card.getPosition())
                 .addValue(NAME_FIELD, card.getName())
                 .addValue(DESCRIPTION_FIELD, card.getDescription());
@@ -93,7 +93,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
             if (resultSet.next()) {
                 return Optional.of(new Card()
                         .setBucketId(resultSet.getLong(BUCKET_ID_FIELD))
-                        .setExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
+                        .setCardExternalId(UUID.fromString(resultSet.getString(EXTERNAL_ID)))
                         .setPosition(resultSet.getDouble(POSITION_FIELD))
                         .setName(resultSet.getString(NAME_FIELD))
                         .setDescription(resultSet.getString(DESCRIPTION_FIELD))
@@ -118,7 +118,7 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
         return jdbcTemplate.query(sql, parameters, (rs, rowNum) ->
                 new Card()
                         .setBucketId(rs.getLong(BUCKET_ID_FIELD))
-                        .setExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
+                        .setCardExternalId(UUID.fromString(rs.getString(EXTERNAL_ID)))
                         .setPosition(rs.getDouble(POSITION_FIELD))
                         .setName(rs.getString(NAME_FIELD))
                         .setCreatedAt(rs.getTimestamp(CREATED_AT_FIELD).toLocalDateTime())

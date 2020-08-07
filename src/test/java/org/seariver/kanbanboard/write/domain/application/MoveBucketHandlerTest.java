@@ -23,21 +23,21 @@ public class MoveBucketHandlerTest extends TestHelper {
     void GIVEN_ValidPosition_MUST_UpdateBucketPosition() {
 
         // given
-        var externalId = UUID.randomUUID();
+        var bucketExternalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(externalId.toString(), position);
+        var command = new MoveBucketCommand(bucketExternalId.toString(), position);
         var repository = mock(WriteBucketRepository.class);
-        var bucket = new Bucket().setExternalId(externalId).setPosition(123);
-        when(repository.findByExternalId(externalId)).thenReturn(Optional.of(bucket));
+        var bucket = new Bucket().setBucketExternalId(bucketExternalId).setPosition(123);
+        when(repository.findByExternalId(bucketExternalId)).thenReturn(Optional.of(bucket));
 
         // when
         var handler = new MoveBucketHandler(repository);
         handler.handle(command);
 
         // then
-        verify(repository).findByExternalId(externalId);
+        verify(repository).findByExternalId(bucketExternalId);
         verify(repository).update(bucket);
-        assertThat(bucket.getExternalId()).isEqualTo(externalId);
+        assertThat(bucket.getBucketExternalId()).isEqualTo(bucketExternalId);
         assertThat(bucket.getPosition()).isEqualTo(position);
     }
 
@@ -45,11 +45,11 @@ public class MoveBucketHandlerTest extends TestHelper {
     void GIVEN_NotExistentUuid_MUST_ThrowException() {
 
         // given
-        var externalId = UUID.randomUUID();
+        var bucketExternalId = UUID.randomUUID();
         var position = faker.number().randomDouble(3, 1, 10);
-        var command = new MoveBucketCommand(externalId.toString(), position);
+        var command = new MoveBucketCommand(bucketExternalId.toString(), position);
         var repository = mock(WriteBucketRepository.class);
-        when(repository.findByExternalId(externalId)).thenReturn(Optional.empty());
+        when(repository.findByExternalId(bucketExternalId)).thenReturn(Optional.empty());
 
         // when
         var handler = new MoveBucketHandler(repository);
@@ -57,7 +57,7 @@ public class MoveBucketHandlerTest extends TestHelper {
             BucketNotExistentException.class, () -> handler.handle(command));
 
         // then
-        verify(repository).findByExternalId(externalId);
+        verify(repository).findByExternalId(bucketExternalId);
         assertThat(exception.getMessage()).isEqualTo("Bucket not exist");
     }
 }

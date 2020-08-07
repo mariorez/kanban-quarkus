@@ -4,18 +4,18 @@ import java.util.UUID;
 
 public class UpdateCardCommand implements Command {
 
-    private final String externalId;
+    private final String cardExternalId;
     private final String name;
     private String description;
 
-    public UpdateCardCommand(String externalId, String name, String description) {
-        this.externalId = externalId;
+    public UpdateCardCommand(String cardExternalId, String name, String description) {
+        this.cardExternalId = cardExternalId;
         this.name = name;
         this.description = description;
     }
 
-    public UUID getExternalId() {
-        return UUID.fromString(externalId);
+    public UUID getCardExternalId() {
+        return UUID.fromString(cardExternalId);
     }
 
     public String getName() {

@@ -20,7 +20,7 @@ public class MoveBucketHandler implements Handler<MoveBucketCommand> {
 
     public void handle(MoveBucketCommand command) {
 
-        var optionalBucket = repository.findByExternalId(command.getExternalId());
+        var optionalBucket = repository.findByExternalId(command.getBucketExternalId());
 
         if (optionalBucket.isEmpty()) {
             throw new BucketNotExistentException(BUCKET_NOT_EXIST);
