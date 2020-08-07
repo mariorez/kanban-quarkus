@@ -156,7 +156,7 @@ public class CardCreationIT extends IntegrationHelper {
 
         return Stream.of(
 
-                // invalid bucketId entries
+                // invalid BUCKETID entries
                 arguments(
                         "{notExistentField:@s, cardId:@uuid, position:@f, name:@s}",
                         args("bucketId"), args("must not be blank")),
@@ -170,7 +170,7 @@ public class CardCreationIT extends IntegrationHelper {
                         "{bucketId:@s(foobar), cardId:@uuid, position:@f, name:@s}",
                         args("bucketId"), args("invalid UUID format")),
 
-                // invalid cardId entries
+                // invalid CARDID entries
                 arguments(
                         "{bucketId:@uuid, notExistentField:@s, position:@f, name:@s}",
                         args("cardId"), args("must not be blank")),
@@ -184,7 +184,7 @@ public class CardCreationIT extends IntegrationHelper {
                         "{bucketId:@uuid, cardId:@s(foobar), position:@f, name:@s}",
                         args("cardId"), args("invalid UUID format")),
 
-                // invalid position entries
+                // invalid POSITION entries
                 arguments(
                         "{bucketId:@uuid, cardId:@uuid, notExistentField:@f, name:@s}",
                         args("position"), args("must be greater than 0")),
