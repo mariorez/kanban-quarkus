@@ -55,13 +55,13 @@ public class WriteCardRest {
     }
 
     @PUT
-    @Path("{id}")
+    @Path("{cardExternalId}")
     @APIResponse(responseCode = "201", description = "Card created successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response update(@PathParam("id") String externalId, CardInput input) {
+    public Response update(@PathParam("cardExternalId") String cardExternalId, CardInput input) {
 
-        var command = new UpdateCardCommand(externalId, input.name, input.description);
+        var command = new UpdateCardCommand(cardExternalId, input.name, input.description);
 
         serviceBus.execute(command);
 

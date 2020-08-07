@@ -55,26 +55,26 @@ public class WriteBucketRest {
     }
 
     @PUT
-    @Path("{id}")
+    @Path("{bucketExternalId}")
     @APIResponse(responseCode = "201", description = "Bucket update successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response update(@PathParam("id") String externalId, BucketInput input) {
+    public Response update(@PathParam("bucketExternalId") String bucketExternalId, BucketInput input) {
 
-        var command = new UpdateBucketCommand(externalId, input.name);
+        var command = new UpdateBucketCommand(bucketExternalId, input.name);
         serviceBus.execute(command);
 
         return Response.noContent().build();
     }
 
     @PUT
-    @Path("{id}/move")
+    @Path("{bucketExternalId}/move")
     @APIResponse(responseCode = "201", description = "Bucket moved successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
     @APIResponse(responseCode = "500", description = "Internal server error")
-    public Response move(@PathParam("id") String externalId, BucketInput input) {
+    public Response move(@PathParam("bucketExternalId") String bucketExternalId, BucketInput input) {
 
-        var command = new MoveBucketCommand(externalId, input.position);
+        var command = new MoveBucketCommand(bucketExternalId, input.position);
         serviceBus.execute(command);
 
         return Response.noContent().build();
