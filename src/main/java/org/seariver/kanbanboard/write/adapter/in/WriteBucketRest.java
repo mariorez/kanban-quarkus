@@ -10,9 +10,9 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.commom.observable.ServiceBus;
-import org.seariver.kanbanboard.write.domain.application.CreateBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.MoveBucketCommand;
-import org.seariver.kanbanboard.write.domain.application.UpdateBucketCommand;
+import org.seariver.kanbanboard.write.application.service.CreateBucketCommand;
+import org.seariver.kanbanboard.write.application.service.MoveBucketCommand;
+import org.seariver.kanbanboard.write.application.service.UpdateBucketCommand;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
@@ -34,7 +34,7 @@ public class WriteBucketRest {
 
     final static Logger logger = Logger.getLogger(WriteBucketRest.class);
 
-    private ServiceBus serviceBus;
+    private final ServiceBus serviceBus;
 
     public WriteBucketRest(ServiceBus serviceBus) {
         this.serviceBus = serviceBus;

@@ -8,8 +8,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.commom.observable.ServiceBus;
-import org.seariver.kanbanboard.write.domain.application.CreateCardCommand;
-import org.seariver.kanbanboard.write.domain.application.UpdateCardCommand;
+import org.seariver.kanbanboard.write.application.service.CreateCardCommand;
+import org.seariver.kanbanboard.write.application.service.UpdateCardCommand;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
@@ -31,7 +31,7 @@ import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 @Tag(name = "card")
 public class WriteCardRest {
 
-    private ServiceBus serviceBus;
+    private final ServiceBus serviceBus;
 
     public WriteCardRest(ServiceBus serviceBus) {
         this.serviceBus = serviceBus;

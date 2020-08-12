@@ -5,7 +5,6 @@ import helper.BlankStringValueProducer;
 import helper.IntegrationHelper;
 import helper.UuidStringValueProducer;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

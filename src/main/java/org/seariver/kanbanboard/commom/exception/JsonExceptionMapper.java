@@ -29,16 +29,16 @@ public class JsonExceptionMapper implements ExceptionMapper<JsonProcessingExcept
             message = INVALID_FORMAT_MESSAGE;
             InvalidFormatException invalidException = (InvalidFormatException) exception;
             errors = invalidException.getPath()
-                .stream()
-                .map(path -> new ErrorField(
-                    path.getFieldName(),
-                    String.valueOf(invalidException.getTargetType())))
-                .collect(Collectors.toList());
+                    .stream()
+                    .map(path -> new ErrorField(
+                            path.getFieldName(),
+                            String.valueOf(invalidException.getTargetType())))
+                    .collect(Collectors.toList());
         }
 
         return Response
-            .status(BAD_REQUEST)
-            .entity(new ResponseError(message, errors))
-            .build();
+                .status(BAD_REQUEST)
+                .entity(new ResponseError(message, errors))
+                .build();
     }
 }

@@ -1,8 +1,8 @@
 package org.seariver.kanbanboard.commom.exception;
 
 import org.seariver.kanbanboard.commom.exception.ResponseError.ErrorField;
-import org.seariver.kanbanboard.write.domain.exception.BucketNotExistentException;
-import org.seariver.kanbanboard.write.domain.exception.WriteException;
+import org.seariver.kanbanboard.write.application.exception.BucketNotExistentException;
+import org.seariver.kanbanboard.write.application.exception.WriteException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -29,9 +29,9 @@ public class WriteDomainExceptionMapper implements ExceptionMapper<WriteExceptio
         }
 
         return Response
-            .status(statusCode)
-            .entity(new ResponseError(errorMessage,
-                List.of(new ErrorField("code", String.valueOf(exception.getCode())))))
-            .build();
+                .status(statusCode)
+                .entity(new ResponseError(errorMessage,
+                        List.of(new ErrorField("code", String.valueOf(exception.getCode())))))
+                .build();
     }
 }

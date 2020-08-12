@@ -2,7 +2,7 @@ package org.seariver.kanbanboard.read.adapter.in;
 
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.seariver.kanbanboard.commom.observable.ServiceBus;
-import org.seariver.kanbanboard.read.domain.application.ListAllBucketQuery;
+import org.seariver.kanbanboard.read.application.service.ListAllBucketQuery;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 @Tag(name = "bucket")
 public class ReadBucketRest {
 
-    private ServiceBus serviceBus;
+    private final ServiceBus serviceBus;
 
     public ReadBucketRest(ServiceBus serviceBus) {
         this.serviceBus = serviceBus;

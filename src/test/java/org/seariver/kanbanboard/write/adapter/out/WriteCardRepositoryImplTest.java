@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.seariver.kanbanboard.write.domain.core.Card;
-import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
-import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
+import org.seariver.kanbanboard.write.application.domain.Card;
+import org.seariver.kanbanboard.write.application.domain.WriteCardRepository;
+import org.seariver.kanbanboard.write.application.exception.DuplicatedDataException;
 
 import java.time.LocalDateTime;
 import java.util.Map;

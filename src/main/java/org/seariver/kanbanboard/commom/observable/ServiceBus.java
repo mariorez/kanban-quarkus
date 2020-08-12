@@ -2,11 +2,11 @@ package org.seariver.kanbanboard.commom.observable;
 
 import org.jboss.logging.Logger;
 import org.seariver.kanbanboard.commom.exception.ServiceBusInvalidObjectException;
-import org.seariver.kanbanboard.read.domain.application.Query;
-import org.seariver.kanbanboard.read.domain.application.Resolver;
+import org.seariver.kanbanboard.read.application.service.Query;
+import org.seariver.kanbanboard.read.application.service.Resolver;
 import org.seariver.kanbanboard.read.observable.QueryEvent;
-import org.seariver.kanbanboard.write.domain.application.Command;
-import org.seariver.kanbanboard.write.domain.application.Handler;
+import org.seariver.kanbanboard.write.application.service.Command;
+import org.seariver.kanbanboard.write.application.service.Handler;
 import org.seariver.kanbanboard.write.observable.CommandEvent;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -17,7 +17,7 @@ import javax.enterprise.inject.spi.CDI;
 public class ServiceBus {
 
     final static Logger logger = Logger.getLogger(ServiceBus.class);
-    private Event<InternalEvent> eventPublisher;
+    private final Event<InternalEvent> eventPublisher;
 
     public ServiceBus(Event<InternalEvent> eventPublisher) {
         this.eventPublisher = eventPublisher;

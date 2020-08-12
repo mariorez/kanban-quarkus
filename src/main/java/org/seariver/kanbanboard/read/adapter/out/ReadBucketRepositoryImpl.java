@@ -1,8 +1,8 @@
 package org.seariver.kanbanboard.read.adapter.out;
 
-import org.seariver.kanbanboard.read.domain.core.BucketDto;
-import org.seariver.kanbanboard.read.domain.core.CardDto;
-import org.seariver.kanbanboard.read.domain.core.ReadBucketRepository;
+import org.seariver.kanbanboard.read.application.domain.BucketDto;
+import org.seariver.kanbanboard.read.application.domain.CardDto;
+import org.seariver.kanbanboard.read.application.domain.ReadBucketRepository;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @ApplicationScoped
 public class ReadBucketRepositoryImpl implements ReadBucketRepository {
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     public ReadBucketRepositoryImpl(DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);

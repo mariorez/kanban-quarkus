@@ -1,8 +1,8 @@
 package org.seariver.kanbanboard.write.adapter.out;
 
-import org.seariver.kanbanboard.write.domain.core.Card;
-import org.seariver.kanbanboard.write.domain.core.WriteCardRepository;
-import org.seariver.kanbanboard.write.domain.exception.DuplicatedDataException;
+import org.seariver.kanbanboard.write.application.domain.Card;
+import org.seariver.kanbanboard.write.application.domain.WriteCardRepository;
+import org.seariver.kanbanboard.write.application.exception.DuplicatedDataException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.seariver.kanbanboard.write.domain.exception.WriteException.Error.INVALID_DUPLICATED_DATA;
+import static org.seariver.kanbanboard.write.application.exception.WriteException.Error.INVALID_DUPLICATED_DATA;
 
 @ApplicationScoped
 public class WriteCardRepositoryImpl implements WriteCardRepository {
@@ -22,11 +22,10 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     public static final String EXTERNAL_ID = "external_id";
     public static final String POSITION_FIELD = "position";
     public static final String NAME_FIELD = "name";
-    private static final String DESCRIPTION_FIELD = "description";
     public static final String CREATED_AT_FIELD = "created_at";
     public static final String UPDATED_AT_FIELD = "updated_at";
-
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private static final String DESCRIPTION_FIELD = "description";
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     public WriteCardRepositoryImpl(DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);

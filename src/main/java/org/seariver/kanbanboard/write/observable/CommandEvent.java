@@ -3,8 +3,8 @@ package org.seariver.kanbanboard.write.observable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.seariver.kanbanboard.commom.observable.InternalEvent;
-import org.seariver.kanbanboard.write.domain.application.Command;
-import org.seariver.kanbanboard.write.domain.exception.WriteException;
+import org.seariver.kanbanboard.write.application.exception.WriteException;
+import org.seariver.kanbanboard.write.application.service.Command;
 
 import java.util.HashMap;
 import java.util.Map;

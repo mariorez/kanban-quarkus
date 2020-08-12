@@ -16,10 +16,10 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
     public Response toResponse(Exception exception) {
 
         return Response
-            .status(INTERNAL_SERVER_ERROR)
-            .entity(new ResponseError(
-                SERVER_ERROR_MESSAGE,
-                List.of(new ResponseError.ErrorField("code", "500"))))
-            .build();
+                .status(INTERNAL_SERVER_ERROR)
+                .entity(new ResponseError(
+                        SERVER_ERROR_MESSAGE,
+                        List.of(new ResponseError.ErrorField("code", "500"))))
+                .build();
     }
 }
