@@ -25,6 +25,8 @@
     <quarkus.platform.version>1.6.1.Final</quarkus.platform.version>
     <spring-jdbc.version>5.2.7.RELEASE</spring-jdbc.version>
     <surefire-plugin.version>2.22.1</surefire-plugin.version>
+    <pitest-maven.version>1.5.2</pitest-maven.version>
+    <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -224,6 +226,18 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>${pitest-maven.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>${pitest-junit5-plugin.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
