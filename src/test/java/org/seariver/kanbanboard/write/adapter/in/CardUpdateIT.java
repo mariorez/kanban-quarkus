@@ -42,7 +42,7 @@ public class CardUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, cardExternalId)
+                .patch(ENDPOINT_PATH, cardExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -67,7 +67,7 @@ public class CardUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, UUID.randomUUID().toString())
+                .patch(ENDPOINT_PATH, UUID.randomUUID().toString())
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

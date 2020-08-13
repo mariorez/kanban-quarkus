@@ -49,7 +49,7 @@ class BucketUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -74,7 +74,7 @@ class BucketUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, UUID.randomUUID().toString())
+                .patch(ENDPOINT_PATH, UUID.randomUUID().toString())
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -102,7 +102,7 @@ class BucketUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, notExistentBucketExternalId)
+                .patch(ENDPOINT_PATH, notExistentBucketExternalId)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode())
                 .contentType(JSON)

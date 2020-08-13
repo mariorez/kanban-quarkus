@@ -16,8 +16,8 @@ import org.seariver.kanbanboard.write.application.service.UpdateBucketCommand;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -54,7 +54,7 @@ public class WriteBucketRest {
         return Response.status(CREATED).build();
     }
 
-    @PUT
+    @PATCH
     @Path("{bucketExternalId}")
     @APIResponse(responseCode = "201", description = "Bucket update successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
@@ -67,7 +67,7 @@ public class WriteBucketRest {
         return Response.noContent().build();
     }
 
-    @PUT
+    @PATCH
     @Path("{bucketExternalId}/move")
     @APIResponse(responseCode = "201", description = "Bucket moved successful")
     @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))

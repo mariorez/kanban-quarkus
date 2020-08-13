@@ -35,19 +35,17 @@ class BucketMoveIT extends IntegrationHelper {
         // setup
         var existentBucketExternalId = "3731c747-ea27-42e5-a52b-1dfbfa9617db";
         var newPosition = 1.23;
-
-        var template = String.format("{" +
-                "  position : %s" +
-                "}", newPosition);
-
-        var payload = new JsonTemplate(template).prettyString();
+        var template = "{ position : $position }";
+        var payload = new JsonTemplate(template)
+                .withVar("position", newPosition)
+                .prettyString();
 
         // verify
         given()
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -75,7 +73,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -103,7 +101,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, notExistentBucketExternalId)
+                .patch(ENDPOINT_PATH, notExistentBucketExternalId)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode())
                 .contentType(JSON)
@@ -132,7 +130,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .put(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(ENDPOINT_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
