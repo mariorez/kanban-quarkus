@@ -9,6 +9,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.seariver.kanbanboard.commom.exception.ResponseError;
 import org.seariver.kanbanboard.commom.observable.ServiceBus;
 import org.seariver.kanbanboard.write.application.service.CreateCardCommand;
+import org.seariver.kanbanboard.write.application.service.MoveCardCommand;
 import org.seariver.kanbanboard.write.application.service.UpdateCardCommand;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -62,6 +63,20 @@ public class WriteCardRest {
     public Response update(@PathParam("cardExternalId") String cardExternalId, CardInput input) {
 
         var command = new UpdateCardCommand(cardExternalId, input.name, input.description);
+
+        serviceBus.execute(command);
+
+        return Response.status(NO_CONTENT).build();
+    }
+
+    @PATCH
+    @Path("{cardExternalId}/move")
+    @APIResponse(responseCode = "201", description = "Card moved successful")
+    @APIResponse(responseCode = "400", content = @Content(schema = @Schema(allOf = ResponseError.class)))
+    @APIResponse(responseCode = "500", description = "Internal server error")
+    public Response move(@PathParam("cardExternalId") String cardExternalId, CardInput input) {
+
+        var command = new MoveCardCommand(cardExternalId, input.position);
 
         serviceBus.execute(command);
 
