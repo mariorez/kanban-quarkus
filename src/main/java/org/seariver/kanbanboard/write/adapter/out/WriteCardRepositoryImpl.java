@@ -68,9 +68,12 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     @Override
     public void update(Card card) {
 
-        var sql = "UPDATE card SET position = :position, name = :name, description = :description WHERE external_id = :external_id";
+        var sql = "UPDATE card " +
+                "SET bucket_id = :bucket_id, position = :position, name = :name, description = :description " +
+                "WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue(BUCKET_ID_FIELD, card.getBucketId())
                 .addValue(EXTERNAL_ID, card.getCardExternalId())
                 .addValue(POSITION_FIELD, card.getPosition())
                 .addValue(NAME_FIELD, card.getName())
@@ -82,7 +85,9 @@ public class WriteCardRepositoryImpl implements WriteCardRepository {
     @Override
     public Optional<Card> findByExternalId(UUID externalId) {
 
-        var sql = "SELECT bucket_id, external_id, position, name, description, created_at, updated_at FROM card WHERE external_id = :external_id";
+        var sql = "SELECT bucket_id, external_id, position, name, description, created_at, updated_at " +
+                "FROM card " +
+                "WHERE external_id = :external_id";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue(EXTERNAL_ID, externalId);

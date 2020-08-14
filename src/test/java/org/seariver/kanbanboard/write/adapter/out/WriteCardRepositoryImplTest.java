@@ -95,21 +95,25 @@ class WriteCardRepositoryImplTest extends TestHelper {
         // given
         var cardExternalId = UUID.fromString("021944cd-f516-4432-ba8d-44a312267c7d");
         var card = repository.findByExternalId(cardExternalId).get();
+        var newBucketId = 2L;
         var newName = faker.pokemon().name();
         var newDescription = faker.lorem().paragraph();
         var newPosition = faker.number().randomDouble(2, 1, 5);
+        card
+                .setBucketId(newBucketId)
+                .setName(newName)
+                .setDescription(newDescription)
+                .setPosition(newPosition);
 
         // when
-        card.setPosition(newPosition);
-        card.setName(newName);
-        card.setDescription(newDescription);
         repository.update(card);
 
         // then
         var actualCard = repository.findByExternalId(cardExternalId).get();
+        assertThat(actualCard.getBucketId()).isEqualTo(newBucketId);
         assertThat(actualCard.getName()).isEqualTo(newName);
-        assertThat(actualCard.getPosition()).isEqualTo(newPosition);
         assertThat(actualCard.getDescription()).isEqualTo(newDescription);
+        assertThat(actualCard.getPosition()).isEqualTo(newPosition);
     }
 
     private static Stream<Arguments> creatingWithDuplicatedDataProvider() {

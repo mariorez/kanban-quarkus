@@ -1,5 +1,6 @@
 package org.seariver.kanbanboard.write.application.service;
 
+import org.seariver.kanbanboard.write.application.domain.WriteBucketRepository;
 import org.seariver.kanbanboard.write.application.domain.WriteCardRepository;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -9,18 +10,23 @@ import javax.inject.Named;
 @ApplicationScoped
 public class MoveCardHandler implements Handler<MoveCardCommand> {
 
-    private final WriteCardRepository repository;
+    private final WriteBucketRepository bucketRepository;
+    private final WriteCardRepository cardRepository;
 
-    public MoveCardHandler(WriteCardRepository repository) {
-        this.repository = repository;
+    public MoveCardHandler(WriteBucketRepository bucketRepository, WriteCardRepository cardRepository) {
+        this.bucketRepository = bucketRepository;
+        this.cardRepository = cardRepository;
     }
 
     public void handle(MoveCardCommand command) {
 
-        var card = repository.findByExternalId(command.getCardExternalId()).get();
+        var card = cardRepository.findByExternalId(command.getCardExternalId()).get();
+        var bucket = bucketRepository.findByExternalId(command.getBucketExternalId()).get();
 
-        card.setPosition(command.getPosition());
+        card
+                .setBucketId(bucket.getId())
+                .setPosition(command.getPosition());
 
-        repository.update(card);
+        cardRepository.update(card);
     }
 }

@@ -76,7 +76,7 @@ public class WriteCardRest {
     @APIResponse(responseCode = "500", description = "Internal server error")
     public Response move(@PathParam("cardExternalId") String cardExternalId, CardInput input) {
 
-        var command = new MoveCardCommand(cardExternalId, input.position);
+        var command = new MoveCardCommand(input.bucketExternalId, cardExternalId, input.position);
 
         serviceBus.execute(command);
 
