@@ -16,15 +16,15 @@
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
-    <mockito-core.version>3.3.3</mockito-core.version>
+    <mockito-core.version>3.4.6</mockito-core.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus-plugin.version>1.6.0.Final</quarkus-plugin.version>
+    <quarkus-plugin.version>1.7.0.Final</quarkus-plugin.version>
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-    <quarkus.platform.version>1.6.1.Final</quarkus.platform.version>
-    <spring-jdbc.version>5.2.7.RELEASE</spring-jdbc.version>
-    <surefire-plugin.version>2.22.1</surefire-plugin.version>
+    <quarkus.platform.version>1.7.0.Final</quarkus.platform.version>
+    <spring-jdbc.version>5.2.8.RELEASE</spring-jdbc.version>
+    <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
     <pitest-maven.version>1.5.2</pitest-maven.version>
     <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
   </properties>
