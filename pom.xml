@@ -27,6 +27,7 @@
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
     <pitest-maven.version>1.5.2</pitest-maven.version>
     <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
+    <dependency-check-maven.version>5.3.2</dependency-check-maven.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -238,6 +239,18 @@
             <version>${pitest-junit5-plugin.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${dependency-check-maven.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
