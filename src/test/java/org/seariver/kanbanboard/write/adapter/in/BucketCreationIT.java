@@ -36,14 +36,15 @@ class BucketCreationIT extends IntegrationHelper {
         var position = faker.number().randomDouble(3, 1, 10);
         var name = faker.pokemon().name();
 
-        var template = String.format("{" +
+        var template = "{" +
                 "  bucketId : $bucketId," +
-                "  position : %s," +
+                "  position : $position," +
                 "  name : $name" +
-                "}", position);
+                "}";
 
         var payload = new JsonTemplate(template)
                 .withVar("bucketId", externalId)
+                .withVar("position", position)
                 .withVar("name", name)
                 .prettyString();
 
