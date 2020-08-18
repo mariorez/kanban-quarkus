@@ -25,7 +25,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 public class CardUpdateIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/cards/{cardExternalId}";
+    public static final String RESOURCE_PATH = "/v1/cards/{cardExternalId}";
 
     @ParameterizedTest
     @MethodSource("provideValidData")
@@ -42,7 +42,7 @@ public class CardUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, cardExternalId)
+                .patch(RESOURCE_PATH, cardExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -67,7 +67,7 @@ public class CardUpdateIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, UUID.randomUUID().toString())
+                .patch(RESOURCE_PATH, UUID.randomUUID().toString())
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

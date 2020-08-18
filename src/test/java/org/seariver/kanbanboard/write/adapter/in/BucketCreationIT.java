@@ -24,9 +24,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @QuarkusTest
-class BuckCreationIT extends IntegrationHelper {
+class BucketCreationIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets";
+    public static final String RESOURCE_PATH = "/v1/buckets";
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
@@ -52,7 +52,7 @@ class BuckCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(CREATED.getStatusCode());
 
@@ -78,7 +78,7 @@ class BuckCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -100,7 +100,7 @@ class BuckCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -132,7 +132,7 @@ class BuckCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

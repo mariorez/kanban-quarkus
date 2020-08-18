@@ -26,7 +26,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 public class CardCreationIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/cards";
+    public static final String RESOURCE_PATH = "/v1/cards";
 
     @Test
     void GIVEN_ValidPayload_MUST_ReturnCreated() {
@@ -55,7 +55,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(CREATED.getStatusCode());
 
@@ -84,7 +84,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -106,7 +106,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -141,7 +141,7 @@ public class CardCreationIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .post(ENDPOINT_PATH)
+                .post(RESOURCE_PATH)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

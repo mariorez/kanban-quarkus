@@ -17,14 +17,14 @@ import static org.hamcrest.Matchers.hasItems;
 @TestProfile(ReadProfile.class)
 public class ReadBucketRestIT extends IntegrationHelper {
 
-    private static final String ENDPOINT_PATH = "/v1/buckets";
+    private static final String RESOURCE_PATH = "/v1/buckets";
 
     @Test
     void WHEN_GetAllBuckets_MUST_ListByPositionOrder() {
 
         var result = given()
                 .when()
-                .get(ENDPOINT_PATH)
+                .get(RESOURCE_PATH)
                 .then()
                 .statusCode(OK.getStatusCode())
                 .contentType(JSON)

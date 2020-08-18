@@ -27,7 +27,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class BucketMoveIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/buckets/{bucketExternalId}/move";
+    public static final String RESOURCE_PATH = "/v1/buckets/{bucketExternalId}/move";
 
     @Test
     void GIVEN_ValidPayload_MUST_UpdateSuccessful() {
@@ -45,7 +45,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(RESOURCE_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
@@ -73,7 +73,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(RESOURCE_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)
@@ -101,7 +101,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, notExistentBucketExternalId)
+                .patch(RESOURCE_PATH, notExistentBucketExternalId)
                 .then()
                 .statusCode(NOT_FOUND.getStatusCode())
                 .contentType(JSON)
@@ -130,7 +130,7 @@ class BucketMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, existentBucketExternalId)
+                .patch(RESOURCE_PATH, existentBucketExternalId)
                 .then()
                 .statusCode(BAD_REQUEST.getStatusCode())
                 .contentType(JSON)

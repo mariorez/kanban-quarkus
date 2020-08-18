@@ -20,7 +20,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @QuarkusTest
 class CardMoveIT extends IntegrationHelper {
 
-    public static final String ENDPOINT_PATH = "/v1/cards/{cardExternalId}/move";
+    public static final String RESOURCE_PATH = "/v1/cards/{cardExternalId}/move";
 
     @ParameterizedTest
     @MethodSource("provideValidMoveData")
@@ -43,7 +43,7 @@ class CardMoveIT extends IntegrationHelper {
                 .contentType(JSON)
                 .body(payload).log().body()
                 .when()
-                .patch(ENDPOINT_PATH, existentCardExternalId)
+                .patch(RESOURCE_PATH, existentCardExternalId)
                 .then()
                 .statusCode(NO_CONTENT.getStatusCode());
 
