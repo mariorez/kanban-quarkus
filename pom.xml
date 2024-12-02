@@ -23,7 +23,7 @@
     <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
     <quarkus.platform.version>1.7.0.Final</quarkus.platform.version>
-    <spring-jdbc.version>5.2.8.RELEASE</spring-jdbc.version>
+    <spring-jdbc.version>6.1.14</spring-jdbc.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
   </properties>
   <dependencyManagement>
